@@ -1,6 +1,5 @@
 package com.accenture.pregunton.config;
 
-import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -17,8 +16,9 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(Predicates.not(PathSelectors.regex("/actuator.*"))).build();
+                .apis(RequestHandlerSelectors.basePackage("com.accenture.pregunton"))
+                .paths(PathSelectors.any())
+                .build();
     }
 
 }
