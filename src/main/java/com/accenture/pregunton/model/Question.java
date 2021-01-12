@@ -21,12 +21,12 @@ public class Question implements Serializable {
     @Column(name = "question")
     private String question;
     @Column(name = "published")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime published;
     @Column(name = "answer")
     @Enumerated(EnumType.STRING)
     private Answer answer;
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_player")
     private Player player;
 
 }

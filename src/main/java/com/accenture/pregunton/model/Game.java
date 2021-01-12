@@ -19,10 +19,11 @@ public class Game implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @Column(name = "category")
     @Enumerated(EnumType.STRING)
     private Category category;
-    @Column(name = "right_guess")
-    private String rightGuess;
+    @Column(name = "hit")
+    private String hit;
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private Set<Rule> rules;
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})

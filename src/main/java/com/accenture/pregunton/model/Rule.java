@@ -18,5 +18,8 @@ public class Rule implements Serializable {
     private String nameRule;
     @Column(name = "value")
     private String value;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "id_game")
+    private Game game;
 
 }

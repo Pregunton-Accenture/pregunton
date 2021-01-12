@@ -20,9 +20,9 @@ public class Hit implements Serializable {
     @Column(name = "is_correct")
     private Boolean isCorrect;
     @Column(name = "published")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime published;
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_player")
     private Player player;
 
 }
