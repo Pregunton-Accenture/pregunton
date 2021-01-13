@@ -1,7 +1,8 @@
 package com.accenture.pregunton.service;
 
-import com.accenture.pregunton.model.Game;
+import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.repository.GameRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,10 +11,11 @@ public class GameService {
 
     @Autowired
     private GameRepository gameRepository;
+    @Autowired
+    private ModelMapper mapper;
 
-    public Game create(Long masterId) {
-        //Dummy Game
-        return new Game();
+    public void create(GameDto gameDto, Long masterId) throws RuntimeException{
+
     }
 
 }

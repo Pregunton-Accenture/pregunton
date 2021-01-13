@@ -1,11 +1,17 @@
 package com.accenture.pregunton.model;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"game"})
+@Builder
 @Entity
 @Table(name = "rules")
 public class Rule implements Serializable {

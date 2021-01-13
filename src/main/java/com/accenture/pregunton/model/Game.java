@@ -1,7 +1,9 @@
 package com.accenture.pregunton.model;
 
 import com.accenture.pregunton.pojo.Category;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -9,8 +11,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-@Data
-@ToString(exclude = {"players", "questions"})
+@Getter
+@Setter
+@ToString(exclude = {"players", "questions", "rules"})
+@Builder
 @Entity
 @Table(name = "games")
 public class Game implements Serializable {

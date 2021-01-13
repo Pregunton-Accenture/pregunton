@@ -1,14 +1,18 @@
 package com.accenture.pregunton.model;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @ToString(exclude = {"player"})
+@Builder
 @Entity
 @Table(name = "hits")
 public class Hit implements Serializable {
