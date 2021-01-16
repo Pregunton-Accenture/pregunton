@@ -22,12 +22,12 @@ public class Game implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "category", columnDefinition = "ENUM('', '', '')")
+    @Column(name = "category")
     @Enumerated(EnumType.STRING)
     private Category category;
     @Column(name = "hit")
     private String hit;
-    @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
+    @OneToMany(mappedBy = "game")
     private Set<Rule> rules;
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(

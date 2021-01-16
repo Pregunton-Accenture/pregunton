@@ -1,6 +1,5 @@
 package com.accenture.pregunton.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,8 +24,7 @@ public class Rule implements Serializable {
     @Column(name = "value")
     private String value;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "id_game")
-    @JsonIgnore
+    @JoinColumn(name = "game_id")
     private Game game;
 
 }

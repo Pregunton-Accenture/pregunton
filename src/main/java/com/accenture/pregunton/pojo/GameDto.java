@@ -2,7 +2,6 @@ package com.accenture.pregunton.pojo;
 
 import com.accenture.pregunton.model.Player;
 import com.accenture.pregunton.model.Question;
-import com.accenture.pregunton.model.Rule;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
