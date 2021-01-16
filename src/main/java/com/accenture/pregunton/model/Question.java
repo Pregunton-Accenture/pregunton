@@ -1,6 +1,7 @@
 package com.accenture.pregunton.model;
 
 import com.accenture.pregunton.pojo.Answer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -30,6 +31,7 @@ public class Question implements Serializable {
     private Answer answer;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_player")
+    @JsonIgnore
     private Player player;
 
 }

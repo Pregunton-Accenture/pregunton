@@ -27,7 +27,7 @@ public class Game implements Serializable {
     private Category category;
     @Column(name = "hit")
     private String hit;
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE)
     private Set<Rule> rules;
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(
