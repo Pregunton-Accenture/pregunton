@@ -1,5 +1,6 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.repository.GameRepository;
 import org.modelmapper.ModelMapper;
@@ -15,7 +16,9 @@ public class GameService {
     private ModelMapper mapper;
 
     public void create(GameDto gameDto, Long masterId) throws RuntimeException{
+        Game game = mapper.map(gameDto, Game.class);
 
+        gameRepository.save(game);
     }
 
 }

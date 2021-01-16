@@ -1,5 +1,6 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;

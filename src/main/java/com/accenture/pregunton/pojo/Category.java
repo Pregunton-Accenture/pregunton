@@ -1,7 +1,7 @@
 package com.accenture.pregunton.pojo;
 
 public enum Category {
-    PERSONJAES,
+    PERSONAJES,
     PELICULAS,
     SERIES,
     LUGARES,

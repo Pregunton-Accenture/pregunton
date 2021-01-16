@@ -17,7 +17,7 @@ public class ModelUtil {
 
     //Dummy Data
     public static final Long ID = 1L;
-    public static final Category CATEGORY = Category.PERSONJAES;
+    public static final Category CATEGORY = Category.PERSONAJES;
     public static final int HITS_LIMIT = 5;
     public static final String DUMMY_QUESTION = "Dummy Question";
     public static final String DUMMY_RULE = "Dummy Rule";

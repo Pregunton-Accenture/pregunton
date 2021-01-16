@@ -16,10 +16,6 @@ import java.util.Set;
 @Setter
 public class GameDto implements Serializable {
 
-    @ApiModelProperty(notes = "The game id", name = "id", required = true)
-    @NotNull(message = "The game id cannot be missing or empty")
-    private Long gameId;
-
     @ApiModelProperty(notes = "The category of the game", name = "category", required = true)
     @NotNull(message = "The game category cannot be missing or empty")
     private Category category;
@@ -28,7 +24,7 @@ public class GameDto implements Serializable {
 
     @ApiModelProperty(notes = "The rules of the game", name = "rules", required = true)
     @NotNull(message = "The game rules cannot be missing or empty")
-    private Set<Rule> rules;
+    private Set<RuleDto> rules;
 
     @ApiModelProperty(notes = "The players of the game", name = "players", required = false)
     private List<Player> players;

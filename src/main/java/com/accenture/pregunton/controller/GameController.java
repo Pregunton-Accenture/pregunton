@@ -26,14 +26,14 @@ public class GameController {
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<Object> createGame(@RequestBody GameDto game, @RequestHeader Long masterId) {
-        gameService.create(game, masterId);
+    public ResponseEntity<Object> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId) {
+        gameService.create(gameDto, masterId);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/")
                 .build()
                 .toUri();
-        return ResponseEntity.created(location).body(game);
+        return ResponseEntity.created(location).body(gameDto);
     }
 
 }

@@ -1,10 +1,7 @@
 package com.accenture.pregunton.model;
 
 import com.accenture.pregunton.pojo.Category;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,6 +12,8 @@ import java.util.Set;
 @Setter
 @ToString(exclude = {"players", "questions", "rules"})
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "games")
 public class Game implements Serializable {
@@ -23,7 +22,7 @@ public class Game implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "category")
+    @Column(name = "category", columnDefinition = "ENUM('', '', '')")
     @Enumerated(EnumType.STRING)
     private Category category;
     @Column(name = "hit")
