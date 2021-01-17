@@ -22,13 +22,17 @@ public class Game implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "category")
-    @Enumerated(EnumType.STRING)
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
     private Category category;
+
     @Column(name = "hit")
     private String hit;
+
     @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE)
     private Set<Rule> rules;
+
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(
             name = "games_players",
@@ -36,6 +40,7 @@ public class Game implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "id_player", referencedColumnName = "id")
     )
     private List<Player> players;
+
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(
             name = "games_questions",

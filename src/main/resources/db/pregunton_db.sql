@@ -93,13 +93,23 @@ CREATE TABLE IF NOT EXISTS `questions` (
 -- Volcando estructura para tabla accenture_pregunton.rules
 CREATE TABLE IF NOT EXISTS `rules` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `id_game` bigint(20) NOT NULL DEFAULT 0,
+  `game_id` bigint(20) NOT NULL DEFAULT 0,
   `name_rule` varchar(255) DEFAULT NULL,
   `value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_rules_games` (`id_game`),
   CONSTRAINT `FK_rules_games` FOREIGN KEY (`id_game`) REFERENCES `games` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Volcando estructura para tabla accenture_pregunton.rules
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `UNQ_name` UNIQUE (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+insert into `categories` (name) values ('PERSONAJES'), ('PELICULAS'), ('SERIES'), ('LUGARES'), ('ANIMALES');
 
 -- La exportación de datos fue deseleccionada.
 
