@@ -1,11 +1,14 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.model.Category;
 import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.model.Player;
 import com.accenture.pregunton.model.Rule;
 import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.PlayerDto;
+import com.accenture.pregunton.pojo.request.PlayerRequestDto;
+import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.RuleRepository;
 import com.google.common.collect.Lists;
@@ -25,10 +28,15 @@ public class GameService {
     @Autowired
     private RuleRepository ruleRepository;
     @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
     private ModelMapper mapper;
 
-    public void create(GameDto gameDto, Long masterId) throws RuntimeException{
+    public void create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException{
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow((() -> new CategoryNotFoundException("Category not found with id: " + categoryId)));
         Game game = mapper.map(gameDto, Game.class);
+        game.setCategory(category);
         gameRepository.save(game);
         saveRulesGame(game.getRules(), game);
     }
@@ -45,7 +53,7 @@ public class GameService {
         return Optional.of(mapper.map(game, GameDto.class));
     }
 
-    public void addOnePlayer(Long gameId, PlayerDto playerDto) {
+    public void addOnePlayer(Long gameId, PlayerRequestDto playerDto) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException("Game not found with id: " + gameId));
 

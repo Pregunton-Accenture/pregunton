@@ -1,8 +1,9 @@
-package com.accenture.pregunton.pojo;
+package com.accenture.pregunton.model;
 
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "categories")
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category {
+public class Category implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +22,5 @@ public class Category {
 
     @Column(name = "name")
     private String name;
+
 }

@@ -22,13 +22,17 @@ public class Question implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "question")
     private String question;
+
     @Column(name = "published")
     private LocalDateTime published;
+
     @Column(name = "answer")
     @Enumerated(EnumType.STRING)
     private Answer answer;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_player")
     @JsonIgnore

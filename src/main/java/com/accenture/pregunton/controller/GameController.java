@@ -1,7 +1,7 @@
 package com.accenture.pregunton.controller;
 
 import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.PlayerDto;
+import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.service.GameService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -32,8 +32,8 @@ public class GameController {
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<Object> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId) {
-        gameService.create(gameDto, masterId);
+    public ResponseEntity<Object> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId, @RequestHeader Long categoryId) {
+        gameService.create(gameDto, masterId, categoryId);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/")
@@ -76,7 +76,7 @@ public class GameController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<Void> addPlayer(@NotNull @PathVariable Long gameId, @RequestBody PlayerDto playerDto) {
+    public ResponseEntity<Void> addPlayer(@NotNull @PathVariable Long gameId, @RequestBody PlayerRequestDto playerDto) {
         gameService.addOnePlayer(gameId, playerDto);
         return ResponseEntity.noContent().build();
     }

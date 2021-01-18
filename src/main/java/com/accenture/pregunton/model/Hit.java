@@ -20,10 +20,13 @@ public class Hit implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "is_correct")
     private Boolean isCorrect;
+
     @Column(name = "published")
     private LocalDateTime published;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_player")
     private Player player;

@@ -1,6 +1,6 @@
 package com.accenture.pregunton.service;
 
-import com.accenture.pregunton.pojo.Category;
+import com.accenture.pregunton.model.Category;
 import com.accenture.pregunton.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

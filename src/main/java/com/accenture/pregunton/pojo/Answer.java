@@ -1,8 +1,8 @@
 package com.accenture.pregunton.pojo;
 
 public enum Answer {
-    SI,
+    SIN_RESPUESTA,
     NO,
-    TAL_VEZ,
-    SIN_RESPUESTA
+    SI,
+    TAL_VEZ
 }

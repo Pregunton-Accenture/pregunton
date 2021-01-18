@@ -1,6 +1,5 @@
 package com.accenture.pregunton.model;
 
-import com.accenture.pregunton.pojo.Category;
 import lombok.*;
 
 import javax.persistence.*;

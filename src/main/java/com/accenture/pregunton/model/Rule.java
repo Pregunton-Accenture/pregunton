@@ -19,10 +19,13 @@ public class Rule implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "name_rule")
     private String nameRule;
+
     @Column(name = "value")
     private String value;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "game_id")
     private Game game;
