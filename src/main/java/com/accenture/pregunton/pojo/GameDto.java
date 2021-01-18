@@ -26,7 +26,7 @@ public class GameDto implements Serializable {
     private Set<RuleDto> rules;
 
     @ApiModelProperty(notes = "The players of the game", name = "players", required = false)
-    private List<Player> players;
+    private List<PlayerDto> players;
 
     @ApiModelProperty(notes = "The questions the players asked", name = "questions", required = false)
     private List<Question> questions;

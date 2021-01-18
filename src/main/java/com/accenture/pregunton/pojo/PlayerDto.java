@@ -17,6 +17,10 @@ public class PlayerDto implements Serializable {
     @NotNull(message = "The hit limit of the player cannot be missing or empty")
     private int hitsLimit;
 
+    @ApiModelProperty(notes = "The nick name of the player", name = "nickName", required = true)
+    @NotNull(message = "The nick name cannot be missing or empty")
+    private String nickName;
+
     @ApiModelProperty(notes = "The questions asked of a certain player.", name = "hitsLimit")
     private List<Question> questions;
 

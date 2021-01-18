@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,13 @@ import java.util.Optional;
 
 @RestController
 @Validated
-@RequestMapping("/pregunton")
+@RequestMapping("/games")
 public class GameController {
 
     @Autowired
     private GameService gameService;
 
-    @PostMapping("/")
+    @PostMapping(value = "/v1.0", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Creates a game.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "created"),
@@ -41,7 +42,7 @@ public class GameController {
         return ResponseEntity.created(location).body(gameDto);
     }
 
-    @DeleteMapping("/{gameId}")
+    @DeleteMapping("/v1.0/{gameId}")
     @ApiOperation("Delete a game.")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "No Content"),
@@ -54,7 +55,7 @@ public class GameController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{gameId}")
+    @GetMapping(value = "/v1.0/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Obtain an specific game.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -67,7 +68,7 @@ public class GameController {
         return gameDto.map(ResponseEntity::ok).orElseGet((() -> ResponseEntity.noContent().build()));
     }
 
-    @PutMapping("/{gameId}")
+    @PatchMapping(value = "/v1.0/{gameId}")
     @ApiOperation("Add player to existing game.")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "No Content"),

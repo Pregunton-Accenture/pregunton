@@ -20,6 +20,8 @@ public class Player implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @Column(name = "nick_name")
+    private String nickName;
     @Column(name = "hits_limit")
     private int hitsLimit;
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
