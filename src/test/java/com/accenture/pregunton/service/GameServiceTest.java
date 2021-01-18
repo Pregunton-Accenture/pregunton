@@ -4,11 +4,10 @@ import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.model.Player;
 import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.PlayerDto;
+import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.RuleRepository;
 import com.accenture.pregunton.util.ModelUtil;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,11 +15,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class GameServiceTest {
@@ -30,6 +29,8 @@ public class GameServiceTest {
     @Mock
     private RuleRepository ruleRepository;
     @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
     private ModelMapper modelMapper;
     @InjectMocks
     private GameService gameService;
@@ -38,7 +39,8 @@ public class GameServiceTest {
     public void shouldCreateNewGame() {
         Game game = ModelUtil.createGame();
         Mockito.when(modelMapper.map(any(), eq(Game.class))).thenReturn(game);
-        gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID);
+        Mockito.when(categoryRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.CATEGORY));
+        gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID);
         Mockito.verify(gameRepository, Mockito.times(1)).save(game);
     }
 
@@ -70,7 +72,7 @@ public class GameServiceTest {
     public void shouldAddAPlayertoAnExistingGame() {
         Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME));
         Mockito.when(modelMapper.map(any(), eq(Player.class))).thenReturn(ModelUtil.PLAYER);
-        gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_DTO);
+        gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
     }
 
     @Test
@@ -78,7 +80,7 @@ public class GameServiceTest {
         Game game = Game.builder().build();
         Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(game));
         Mockito.when(modelMapper.map(any(), eq(Player.class))).thenReturn(ModelUtil.PLAYER);
-        gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_DTO);
+        gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
     }
 
 }

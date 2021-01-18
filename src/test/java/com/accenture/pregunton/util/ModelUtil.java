@@ -1,13 +1,10 @@
 package com.accenture.pregunton.util;
 
-import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.model.Player;
-import com.accenture.pregunton.model.Question;
-import com.accenture.pregunton.model.Rule;
+import com.accenture.pregunton.model.*;
 import com.accenture.pregunton.pojo.Answer;
-import com.accenture.pregunton.pojo.Category;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.pojo.PlayerDto;
+import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
@@ -20,15 +17,16 @@ public class ModelUtil {
 
     //Dummy Data
     public static final Long ID = 1L;
-    public static final Category CATEGORY = Category.builder().name("PERSONAJES").build();
     public static final int HITS_LIMIT = 5;
-    public static final String DUMMY_QUESTION = "Dummy Question";
-    public static final String DUMMY_RULE = "Dummy Rule";
-    public static final String DUMMY_RULE_VALUE = "Dummy Rule value";
-    public static final String DUMMY_HIT = "Dummy Hit";
+    public static final String DUMMY_CATEGORY = "PERSONAJES";
+    public static final String DUMMY_QUESTION = "Es una persona?";
+    public static final String DUMMY_RULE = "Solo 3 palabras por pregunta";
+    public static final String RULE_VALUE = "3";
+    public static final String HIT = "John Doe";
     public static final String NICK_NAME = "Ruso";
 
     //models
+    public static final Category CATEGORY = createCategory();
     public static final Question QUESTION = createQuestion();
     public static final Player PLAYER = createPlayer();
     public static final Rule RULE = createRule();
@@ -37,6 +35,7 @@ public class ModelUtil {
     //Dtos
     public static final GameDto GAME_DTO = MODEL_MAPPER.map(GAME, GameDto.class);
     public static final PlayerDto PLAYER_DTO = MODEL_MAPPER.map(PLAYER, PlayerDto.class);
+    public static final PlayerRequestDto PLAYER_REQUEST_DTO = MODEL_MAPPER.map(PLAYER, PlayerRequestDto.class);
 
 
     public static Game createGame() {
@@ -46,7 +45,7 @@ public class ModelUtil {
                 .questions(Stream.of(QUESTION).collect(Collectors.toList()))
                 .rules(Stream.of(RULE).collect(Collectors.toSet()))
                 .players(Stream.of(PLAYER).collect(Collectors.toList()))
-                .hit(DUMMY_HIT)
+                .hit(HIT)
                 .build();
     }
 
@@ -72,7 +71,14 @@ public class ModelUtil {
         return Rule.builder()
                 .id(ID)
                 .nameRule(DUMMY_RULE)
-                .value(DUMMY_RULE_VALUE)
+                .value(RULE_VALUE)
+                .build();
+    }
+
+    public static Category createCategory() {
+        return Category.builder()
+                .id(ID)
+                .name(DUMMY_CATEGORY)
                 .build();
     }
 
