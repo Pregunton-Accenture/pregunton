@@ -24,6 +24,7 @@ public class ModelUtil {
     public static final String RULE_VALUE = "3";
     public static final String HIT = "John Doe";
     public static final String NICK_NAME = "Ruso";
+    public static final String CODE = "ABC12";
 
     //models
     public static final Category CATEGORY = createCategory();
@@ -42,6 +43,7 @@ public class ModelUtil {
         return  Game.builder()
                 .id(ID)
                 .category(CATEGORY)
+                .code(CODE)
                 .questions(Stream.of(QUESTION).collect(Collectors.toList()))
                 .rules(Stream.of(RULE).collect(Collectors.toSet()))
                 .players(Stream.of(PLAYER).collect(Collectors.toList()))

@@ -1,6 +1,7 @@
 package com.accenture.pregunton.controller;
 
 import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;
@@ -17,10 +18,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -38,17 +42,13 @@ public class GameControllerTest {
 
     @Test
     public void whenValidInputCreateGame_thenReturns201() throws Exception {
-
-        gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID);
-
-        Mockito.verify(gameService, Mockito.times(1)).create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID);
+        Mockito.when(gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID)).thenReturn(ModelUtil.GAME);
 
         mvc.perform(
                 post("/games/v1.0/")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
                     .contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
+                    .content(objectMapper.writeValueAsString(ModelUtil.GAME))
                     .header("masterId", String.valueOf(2L))
                     .header("categoryId", String.valueOf(2L))
         ).andExpect(status().isCreated());
@@ -91,7 +91,7 @@ public class GameControllerTest {
         Mockito.verify(gameService, Mockito.times(1)).delete(ModelUtil.ID);
 
         mvc.perform(
-                delete(String.format("/games/v1.0/%s", ModelUtil.ID))
+                delete("/games/v1.0/{gameId}", ModelUtil.ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
@@ -106,7 +106,7 @@ public class GameControllerTest {
         Mockito.when(gameService.getOne(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME_DTO));
 
         mvc.perform(
-                get(String.format("/games/v1.0/%s", ModelUtil.ID))
+                get("/games/v1.0/{gameId}", ModelUtil.ID)
                     .accept(MediaType.APPLICATION_JSON_VALUE)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .characterEncoding("utf-8")

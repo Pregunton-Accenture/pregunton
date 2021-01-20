@@ -18,6 +18,9 @@ public class GameDto implements Serializable {
     @NotNull(message = "The user id cannot be missing or empty")
     private String hit;
 
+    @ApiModelProperty(notes = "The code session of the game", name = "code", required = false)
+    private String code;
+
     @ApiModelProperty(notes = "The rules of the game", name = "rules", required = true)
     @NotNull(message = "The game rules cannot be missing or empty")
     private Set<RuleDto> rules;

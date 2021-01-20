@@ -1,5 +1,6 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.service.GameService;
@@ -25,7 +26,7 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-    @PostMapping(value = "/v1.0", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/v1.0")
     @ApiOperation("Creates a game.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "created"),
@@ -33,13 +34,13 @@ public class GameController {
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
     public ResponseEntity<Object> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId, @RequestHeader Long categoryId) {
-        gameService.create(gameDto, masterId, categoryId);
+        Game game = gameService.create(gameDto, masterId, categoryId);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/")
                 .build()
                 .toUri();
-        return ResponseEntity.created(location).body(gameDto);
+        return ResponseEntity.created(location).body(game.getCode());
     }
 
     @DeleteMapping("/v1.0/{gameId}")
@@ -68,7 +69,7 @@ public class GameController {
         return gameDto.map(ResponseEntity::ok).orElseGet((() -> ResponseEntity.noContent().build()));
     }
 
-    @PatchMapping(value = "/v1.0/{gameId}")
+    @PatchMapping("/v1.0/{gameId}")
     @ApiOperation("Add player to existing game.")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "No Content"),

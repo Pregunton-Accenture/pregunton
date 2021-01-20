@@ -32,13 +32,14 @@ public class GameService {
     @Autowired
     private ModelMapper mapper;
 
-    public void create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException{
+    public Game create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException{
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow((() -> new CategoryNotFoundException("Category not found with id: " + categoryId)));
         Game game = mapper.map(gameDto, Game.class);
         game.setCategory(category);
         gameRepository.save(game);
         saveRulesGame(game.getRules(), game);
+        return game;
     }
 
     public void delete(Long id) {
