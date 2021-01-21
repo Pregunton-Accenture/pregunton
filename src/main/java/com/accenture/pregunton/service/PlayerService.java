@@ -54,6 +54,7 @@ public class PlayerService {
         return Optional.of(mapper.map(player, PlayerDto.class));
     }
 
+    //Feature
     private void alreadyLost(Player player) {
         int NO_MORE_CHANCES = 0;
         if (player.getHitsLimit() != NO_MORE_CHANCES) {

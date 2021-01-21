@@ -1,7 +1,5 @@
 package com.accenture.pregunton.controller;
 
-import com.accenture.pregunton.model.Player;
-import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.pojo.PlayerDto;
 import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.service.PlayerService;
@@ -23,7 +21,7 @@ public class PlayerController {
     @Autowired
     private PlayerService playerService;
 
-    @PatchMapping("/v1.0/{playerId}")
+    @PatchMapping("/v1.0")
     @ApiOperation("Ask a question.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -40,6 +38,7 @@ public class PlayerController {
     @ApiOperation("Search player.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 204, message = "No Content"),
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
