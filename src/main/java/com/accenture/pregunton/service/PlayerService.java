@@ -4,12 +4,15 @@ import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.model.Game;
+import com.accenture.pregunton.model.Hit;
 import com.accenture.pregunton.model.Player;
 import com.accenture.pregunton.model.Question;
 import com.accenture.pregunton.pojo.Answer;
+import com.accenture.pregunton.pojo.HitDto;
 import com.accenture.pregunton.pojo.PlayerDto;
 import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.GameRepository;
+import com.accenture.pregunton.repository.HitRepository;
 import com.accenture.pregunton.repository.PlayerRepository;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
@@ -28,6 +31,8 @@ public class PlayerService {
     @Autowired
     private GameRepository gameRepository;
     @Autowired
+    private HitRepository hitRepository;
+    @Autowired
     private ModelMapper mapper;
 
     public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
@@ -45,6 +50,27 @@ public class PlayerService {
         saveGameQuestion(gameCode, question);
 
         return mapper.map(question, QuestionDto.class);
+    }
+
+    public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found with id: " + playerId));
+        Game game = gameRepository.findByCode(gameCode)
+                .orElseThrow(() -> new GameNotFoundException("Game not found with code: " + gameCode));
+
+        alreadyLost(player);
+
+        Hit hit = Hit.builder()
+                .guess(guess)
+                .published(LocalDateTime.now())
+                .player(player)
+                .build();
+
+        hit.setIsCorrect(game.getHit().equals(guess));
+
+        hitRepository.save(hit);
+
+        return mapper.map(hit, HitDto.class);
     }
 
     public Optional<PlayerDto> getPlayer (Long playerId) {

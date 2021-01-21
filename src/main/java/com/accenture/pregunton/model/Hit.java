@@ -1,5 +1,6 @@
 package com.accenture.pregunton.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,6 +22,9 @@ public class Hit implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "guess")
+    private String guess;
+
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
@@ -29,6 +33,7 @@ public class Hit implements Serializable {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_player")
+    @JsonIgnore
     private Player player;
 
 }
