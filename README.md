@@ -17,21 +17,20 @@ I will provide a list with the depedencies and their download link:
 * Git ([Download link](https://git-scm.com/downloads))
 * MariaDB ([Download link](https://downloads.mariadb.org/))
 * Project Lombok ([Download link](https://projectlombok.org/download))
-* Execute the pregunton_db.sql in ../pregunton/src/main/resources/db/pregunton_db.sql on MariaDB.
-* Create a new file named: ```database.properties``` into ../pregunton/src/main/resources/ with the following data:
-    * spring.datasource.url=jdbc:mariadb://localhost:3306/accenture_pregunton
-    * spring.jpa.properties.hibernate.id.new_generator_mappings = true
-    * spring.jpa.hibernate.ddl-auto=validate
-    * spring.datasource.username = ```your username```
-    * spring.datasource.password = ```your password``` (if you have not set any password, you can omit this line)
-
 
 ## Installation
 ___
 1. Open your command prompt and go to a root projects folder.
 2. Then clone the project with ```git clone https://github.com/Popovich26/pregunton.git``` command.
-3. After the installation, you must jump into the project folder with your command prompt.
-4. Finally, you must execute the next command: ```mvn clean install```.
+3. Execute the pregunton_db.sql in ../pregunton/src/main/resources/db/pregunton_db.sql on MariaDB.
+4. Create a new file named: ```database.properties``` into ../pregunton/src/main/resources/ with the following data:
+    * spring.datasource.url=jdbc:mariadb://localhost:3306/accenture_pregunton
+    * spring.jpa.properties.hibernate.id.new_generator_mappings = true
+    * spring.jpa.hibernate.ddl-auto=validate
+    * spring.datasource.username = ```your username```
+    * spring.datasource.password = ```your password``` (if you have not set any password, you can omit this line)
+5. After the installation, you must jump into the project folder with your command prompt.
+6. Finally, you must execute the next command: ```mvn clean install```.
 
 ## Start Up
 ___
