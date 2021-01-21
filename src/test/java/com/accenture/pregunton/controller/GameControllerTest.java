@@ -1,7 +1,6 @@
 package com.accenture.pregunton.controller;
 
 import com.accenture.pregunton.exception.GameNotFoundException;
-import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;
@@ -18,13 +17,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)

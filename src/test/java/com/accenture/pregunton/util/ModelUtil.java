@@ -4,6 +4,7 @@ import com.accenture.pregunton.model.*;
 import com.accenture.pregunton.pojo.Answer;
 import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.pojo.PlayerDto;
+import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import org.modelmapper.ModelMapper;
 
@@ -37,6 +38,7 @@ public class ModelUtil {
     public static final GameDto GAME_DTO = MODEL_MAPPER.map(GAME, GameDto.class);
     public static final PlayerDto PLAYER_DTO = MODEL_MAPPER.map(PLAYER, PlayerDto.class);
     public static final PlayerRequestDto PLAYER_REQUEST_DTO = MODEL_MAPPER.map(PLAYER, PlayerRequestDto.class);
+    public static final QuestionDto QUESTION_DTO = MODEL_MAPPER.map(QUESTION, QuestionDto.class);
 
 
     public static Game createGame() {
