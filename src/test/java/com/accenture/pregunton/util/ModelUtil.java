@@ -23,7 +23,7 @@ public class ModelUtil {
     public static final String DUMMY_QUESTION = "Es una persona?";
     public static final String DUMMY_RULE = "Solo 3 palabras por pregunta";
     public static final String RULE_VALUE = "3";
-    public static final String HIT = "John Doe";
+    public static final String HIT_VALUE = "John Doe";
     public static final String NICK_NAME = "Ruso";
     public static final String CODE = "ABC12";
 
@@ -31,6 +31,7 @@ public class ModelUtil {
     public static final Category CATEGORY = createCategory();
     public static final Question QUESTION = createQuestion();
     public static final Player PLAYER = createPlayer();
+    public static final Hit HIT = createHit();
     public static final Rule RULE = createRule();
     public static final Game GAME = createGame();
 
@@ -49,7 +50,7 @@ public class ModelUtil {
                 .questions(Stream.of(QUESTION).collect(Collectors.toList()))
                 .rules(Stream.of(RULE).collect(Collectors.toSet()))
                 .players(Stream.of(PLAYER).collect(Collectors.toList()))
-                .hit(HIT)
+                .hit(HIT_VALUE)
                 .build();
     }
 
@@ -83,6 +84,14 @@ public class ModelUtil {
         return Category.builder()
                 .id(ID)
                 .name(DUMMY_CATEGORY)
+                .build();
+    }
+
+    public static Hit createHit() {
+        return Hit.builder()
+                .id(ID)
+                .isCorrect(true)
+                .player(PLAYER)
                 .build();
     }
 

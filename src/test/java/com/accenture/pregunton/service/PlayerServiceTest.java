@@ -1,7 +1,6 @@
 package com.accenture.pregunton.service;
 
 import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.model.Player;
 import com.accenture.pregunton.pojo.PlayerDto;
 import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.GameRepository;
@@ -17,9 +16,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
-import static org.junit.Assert.*;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlayerServiceTest {

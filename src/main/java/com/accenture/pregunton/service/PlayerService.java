@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ public class PlayerService {
         Game game = gameRepository.findByCode(gameCode)
                 .orElseThrow(() -> new GameNotFoundException("Game not found with code: " + gameCode));
 
-        alreadyLost(player);
+        checkIfPlayerAlreadyLose(player);
 
         Hit hit = Hit.builder()
                 .guess(guess)
@@ -66,7 +67,7 @@ public class PlayerService {
                 .player(player)
                 .build();
 
-        hit.setIsCorrect(game.getHit().equals(guess));
+        hit.setIsCorrect(game.getHit().toLowerCase(Locale.ROOT).equals(guess.toLowerCase(Locale.ROOT)));
 
         hitRepository.save(hit);
 
@@ -80,13 +81,12 @@ public class PlayerService {
         return Optional.of(mapper.map(player, PlayerDto.class));
     }
 
-    //Feature
-    private void alreadyLost(Player player) {
+    private void checkIfPlayerAlreadyLose(Player player) {
         int NO_MORE_CHANCES = 0;
         if (player.getHitsLimit() != NO_MORE_CHANCES) {
             player.setHitsLimit(player.getHitsLimit() - 1);
         } else {
-            throw new GameOverException("This player already lost.");
+            throw new GameOverException("This player already lose.");
         }
     }
 
