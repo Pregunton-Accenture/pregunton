@@ -1,10 +1,7 @@
 package com.accenture.pregunton.util;
 
 import com.accenture.pregunton.model.*;
-import com.accenture.pregunton.pojo.Answer;
-import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.PlayerDto;
-import com.accenture.pregunton.pojo.QuestionDto;
+import com.accenture.pregunton.pojo.*;
 import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import org.modelmapper.ModelMapper;
 
@@ -19,8 +16,9 @@ public class ModelUtil {
     //Dummy Data
     public static final Long ID = 1L;
     public static final int HITS_LIMIT = 5;
-    public static final String DUMMY_CATEGORY = "PERSONAJES";
-    public static final String DUMMY_QUESTION = "Es una persona?";
+    public static final String DUMMY_CATEGORY = "SOME CATEGORY";
+    public static final String DUMMY_QUESTION = "SOME QUESTION";
+    public static final String CORRECT_GUESS = "John Doe";
     public static final String DUMMY_RULE = "Solo 3 palabras por pregunta";
     public static final String RULE_VALUE = "3";
     public static final String HIT_VALUE = "John Doe";
@@ -40,6 +38,7 @@ public class ModelUtil {
     public static final PlayerDto PLAYER_DTO = MODEL_MAPPER.map(PLAYER, PlayerDto.class);
     public static final PlayerRequestDto PLAYER_REQUEST_DTO = MODEL_MAPPER.map(PLAYER, PlayerRequestDto.class);
     public static final QuestionDto QUESTION_DTO = MODEL_MAPPER.map(QUESTION, QuestionDto.class);
+    public static final HitDto HIT_DTO = MODEL_MAPPER.map(HIT, HitDto.class);
 
 
     public static Game createGame() {
@@ -91,6 +90,8 @@ public class ModelUtil {
         return Hit.builder()
                 .id(ID)
                 .isCorrect(true)
+                .published(LocalDateTime.now())
+                .guess(ModelUtil.CORRECT_GUESS)
                 .player(PLAYER)
                 .build();
     }

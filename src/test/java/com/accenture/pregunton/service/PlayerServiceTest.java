@@ -1,9 +1,14 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.pregunton.exception.GameOverException;
+import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.model.Game;
+import com.accenture.pregunton.model.Player;
+import com.accenture.pregunton.pojo.HitDto;
 import com.accenture.pregunton.pojo.PlayerDto;
 import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.GameRepository;
+import com.accenture.pregunton.repository.HitRepository;
 import com.accenture.pregunton.repository.PlayerRepository;
 import com.accenture.pregunton.util.ModelUtil;
 import org.junit.Before;
@@ -18,8 +23,7 @@ import org.modelmapper.ModelMapper;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlayerServiceTest {
@@ -31,6 +35,8 @@ public class PlayerServiceTest {
     @Mock
     private PlayerRepository playerRepository;
     @Mock
+    private HitRepository hitRepository;
+    @Mock
     private GameRepository gameRepository;
 
     @Before
@@ -39,6 +45,7 @@ public class PlayerServiceTest {
 
         Mockito.when(modelMapper.map(ModelUtil.QUESTION, QuestionDto.class)).thenReturn(ModelUtil.QUESTION_DTO);
         Mockito.when(modelMapper.map(ModelUtil.PLAYER, PlayerDto.class)).thenReturn(ModelUtil.PLAYER_DTO);
+        Mockito.when(modelMapper.map(ModelUtil.HIT, HitDto.class)).thenReturn(ModelUtil.HIT_DTO);
     }
 
     @Test
@@ -70,10 +77,39 @@ public class PlayerServiceTest {
     @Test
     public void getPlayer_whenSendingValidId_ShouldReturnAPlayer() {
         Optional<PlayerDto> playerDto = playerService.getPlayer(ModelUtil.ID);
-
         Mockito.when(playerService.getPlayer(anyLong())).thenReturn(Optional.of(ModelUtil.PLAYER_DTO));
 
         assertEquals(ModelUtil.PLAYER_DTO, playerDto.get());
+    }
+
+    @Test(expected = PlayerNotFoundException.class)
+    public void getPlayer_WhenSendingInvalidID_ShouldReturnExpcetion() {
+        playerService.getPlayer(any());
+
+        Mockito.doThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID))
+                .when(playerRepository).findById(anyLong());
+    }
+
+    @Test
+    public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrect_ShouldReturnTrue() {
+        Mockito.when(gameRepository.findByCode(anyString())).thenReturn(Optional.of(ModelUtil.GAME));
+        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+        Mockito.when(playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS)).thenReturn(ModelUtil.HIT_DTO);
+    }
+
+    @Test(expected = GameOverException.class)
+    public void makeAGuess_IfThePlayerMakeAGuessAndDontHaveMoreChances_ShouldReturnGameOverException() {
+        Mockito.when(gameRepository.findByCode(anyString())).thenReturn(Optional.of(ModelUtil.GAME));
+
+        Player player = ModelUtil.createPlayer();
+        player.setHitsLimit(0);
+
+        Mockito.when(playerRepository.findById(anyLong())).thenReturn(Optional.of(player));
+
+        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+
+        Mockito.doThrow(new GameOverException("This player already lose."))
+                .when(playerService).makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
     }
 
 }
