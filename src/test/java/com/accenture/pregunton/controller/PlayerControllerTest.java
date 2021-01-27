@@ -1,7 +1,10 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pregunton.exception.GameOverException;
+import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.service.PlayerService;
 import com.accenture.pregunton.util.ModelUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,10 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -65,5 +66,54 @@ public class PlayerControllerTest {
 
     }
 
+    @Test
+    public void obtainPlayer_WhenInvalidInput_ShouldReturn404Exception() throws Exception {
+
+        Mockito.doThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID))
+                .when(playerService).getPlayer(any());
+
+        mvc.perform(
+                get("/player/v1.0/{playerId}", ModelUtil.ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
+                        .param("playerId", String.valueOf(ModelUtil.ID))
+                        .characterEncoding("utf-8")
+        ).andExpect(status().is4xxClientError());
+
+    }
+
+    @Test
+    public void makeAGuess_WhenAPlayerMakeAGuess_ShouldReturn200() throws Exception {
+
+        Mockito.when(playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS))
+                .thenReturn(ModelUtil.HIT_DTO);
+
+        mvc.perform(
+                post("/player/v1.0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
+                        .header("playerId", String.valueOf(ModelUtil.ID))
+                        .header("code", ModelUtil.CODE)
+                        .characterEncoding("utf-8")
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void makeAGuess_WhenAPlayerHasNoMoreChances_ShouldReturn400Exception() throws Exception {
+
+        Mockito.when(playerService.makeAGuess(any(), any(), any()))
+                .thenThrow(new GameOverException("This player already lose."));
+
+        mvc.perform(
+                post("/player/v1.0")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
+                        .header("playerId", String.valueOf(ModelUtil.ID))
+                        .header("code", ModelUtil.CODE)
+                        .characterEncoding("utf-8")
+        ).andExpect(status().is4xxClientError());
+
+    }
 
 }
