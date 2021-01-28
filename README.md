@@ -57,6 +57,6 @@ ___
       * /v1.0 => adds a new question into the player and the game that matchs with the provided CODE and player ID.
     * __GET__ method
       * /v1.0/{playerId} => seartch a player to get his information that matchs with the provided ID from the database.
-  * /category
+  * /categories
     * __GET__ method
       * / => retrieves all the categories information saved on the database

@@ -18,8 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,15 +37,16 @@ public class GameControllerTest {
 
     @Test
     public void whenValidInputCreateGame_thenReturns201() throws Exception {
-        Mockito.when(gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID)).thenReturn(ModelUtil.GAME);
+
+        Mockito.doReturn(ModelUtil.GAME).when(gameService).create(any(), anyLong(), anyLong());
 
         mvc.perform(
                 post("/games/v1.0/")
                     .contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
-                    .content(objectMapper.writeValueAsString(ModelUtil.GAME))
-                    .header("masterId", String.valueOf(2L))
-                    .header("categoryId", String.valueOf(2L))
+                    .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
+                    .header("masterId", ModelUtil.ID)
+                    .header("categoryId", ModelUtil.ID)
         ).andExpect(status().isCreated());
 
     }

@@ -1,5 +1,6 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pregunton.pojo.HitDto;
 import com.accenture.pregunton.pojo.PlayerDto;
 import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.service.PlayerService;
@@ -29,9 +30,22 @@ public class PlayerController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<Object> makeAQuestion(@RequestHeader Long playerId, @RequestHeader String code, String question) {
+    public ResponseEntity<QuestionDto> makeAQuestion(@RequestHeader Long playerId, @RequestHeader String code, String question) {
         QuestionDto questionDto = playerService.askQuestion(playerId, code, question);
         return ResponseEntity.ok(questionDto);
+    }
+
+    @PostMapping("/v1.0")
+    @ApiOperation("Make a guess.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Not Found"),
+            @ApiResponse(code = 500, message = "Internal Server Error"),
+    })
+    public ResponseEntity<HitDto> makeAGuess(@RequestHeader Long playerId, @RequestHeader String code, String guess) {
+        HitDto playerGuess = playerService.makeAGuess(playerId, code, guess);
+        return ResponseEntity.ok(playerGuess);
     }
 
     @GetMapping(value = "/v1.0/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)

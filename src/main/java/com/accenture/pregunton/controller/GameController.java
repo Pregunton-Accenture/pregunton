@@ -33,7 +33,7 @@ public class GameController {
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<Object> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId, @RequestHeader Long categoryId) {
+    public ResponseEntity<String> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId, @RequestHeader Long categoryId) {
         Game game = gameService.create(gameDto, masterId, categoryId);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -81,5 +81,7 @@ public class GameController {
         gameService.addOnePlayer(gameId, playerDto);
         return ResponseEntity.noContent().build();
     }
+
+
 
 }
