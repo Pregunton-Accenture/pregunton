@@ -41,7 +41,7 @@ public class PlayerControllerTest {
         Mockito.when(playerService.askQuestion(anyLong(), anyString(), anyString())).thenReturn(ModelUtil.QUESTION_DTO);
 
         mvc.perform(
-                patch("/players/v1.0")
+                patch("/players/v1.0/ask")
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ModelUtil.QUESTION_DTO))
@@ -88,7 +88,7 @@ public class PlayerControllerTest {
                 .thenReturn(ModelUtil.HIT_DTO);
 
         mvc.perform(
-                post("/players/v1.0")
+                post("/players/v1.0/guess")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
                         .header("playerId", String.valueOf(ModelUtil.ID))
@@ -105,7 +105,7 @@ public class PlayerControllerTest {
                 .thenThrow(new GameOverException("This player already lose."));
 
         mvc.perform(
-                post("/players/v1.0")
+                post("/players/v1.0/guess")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
                         .header("playerId", String.valueOf(ModelUtil.ID))

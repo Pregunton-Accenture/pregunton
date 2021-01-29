@@ -2,6 +2,7 @@ package com.accenture.pregunton.controller;
 
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,6 +69,23 @@ public class GameControllerTest {
                     .header("masterId", ModelUtil.ID)
                     .header("categoryId", ModelUtil.ID)
         ).andExpect(status().is4xxClientError());
+
+    }
+
+    @Test
+    public void createGame_WhenSendingInvalidInputToCreateAGame_ShouldThrowUnexpectedException() throws Exception {
+
+        Mockito.doThrow(new RuntimeException("500")).when(gameService).create(any(GameDto.class), anyLong(), anyLong());
+
+        mvc.perform(
+                post("/games/v1.0/")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("masterId", String.valueOf(2L))
+                        .header("categoryId", String.valueOf(2L))
+                        .characterEncoding("utf-8")
+        ).andExpect(status().is5xxServerError());
 
     }
 
