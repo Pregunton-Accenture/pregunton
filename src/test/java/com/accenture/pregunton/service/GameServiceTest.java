@@ -1,5 +1,6 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.model.Player;
@@ -8,6 +9,7 @@ import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.RuleRepository;
 import com.accenture.pregunton.util.ModelUtil;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,32 +46,51 @@ public class GameServiceTest {
         Mockito.verify(gameRepository, Mockito.times(1)).save(game);
     }
 
+    @Test(expected = CategoryNotFoundException.class)
+    public void create_WhenCategoryIDDoesNotExists_ShouldThrowCategoryNotFoundException() {
+        Game game = ModelUtil.createGame();
+        Mockito.when(categoryRepository.findById(ModelUtil.ID)).thenReturn(Optional.empty());
+        gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID);
+    }
+
     @Test
     public void shouldDeleteGame() {
         Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME));
         gameService.delete(ModelUtil.ID);
-        Mockito.verify(gameRepository).delete(ModelUtil.GAME);
-    }
-
-    @Test
-    public void shouldGetOneGame() {
-        Mockito.when(gameRepository.findById(ModelUtil.ID))
-                .thenReturn(Optional.of(ModelUtil.GAME));
-        Mockito.when(modelMapper.map(any(), eq(GameDto.class)))
-                .thenReturn(ModelUtil.GAME_DTO);
-        Mockito.when(gameService.getOne(ModelUtil.ID))
-                .thenReturn(Optional.of(ModelUtil.GAME_DTO));
+        Mockito.verify(gameRepository, Mockito.times(1)).delete(ModelUtil.GAME);
     }
 
     @Test(expected = GameNotFoundException.class)
-    public void shouldThrowAnExceptionWhenGameNotFound() throws GameNotFoundException {
-        Mockito.when(gameRepository.findById(ModelUtil.ID))
-                .thenThrow(new GameNotFoundException("Game not found with id: " + ModelUtil.ID));
-        gameService.getOne(ModelUtil.ID);
+    public void delete_WhenIDDoesNotExists_ShouldThrowGameNotFoundException() {
+        Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.empty());
+        gameService.delete(ModelUtil.ID);
     }
 
     @Test
-    public void shouldAddAPlayertoAnExistingGame() {
+    public void getOne_WhenIDExists_ShouldReturnGameDto() {
+        Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME));
+        Mockito.when(modelMapper.map(any(), eq(GameDto.class))).thenReturn(ModelUtil.GAME_DTO);
+
+        Optional<GameDto> result = gameService.getOne(ModelUtil.ID);
+
+        Assert.assertTrue(result.isPresent());
+        Assert.assertEquals(ModelUtil.GAME_DTO, result.get());
+    }
+
+    @Test(expected = GameNotFoundException.class)
+    public void shouldThrowAnExceptionWhenGameNotFound() {
+        Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.empty());
+        gameService.getOne(ModelUtil.ID);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getOne_WhenIDIsNull_ShouldThrowIllegalArgumentException() {
+        Mockito.when(gameRepository.findById(null)).thenThrow(IllegalArgumentException.class);
+        gameService.getOne(null);
+    }
+
+    @Test
+    public void shouldAddAPlayerToAnExistingGame() {
         Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME));
         Mockito.when(modelMapper.map(any(), eq(Player.class))).thenReturn(ModelUtil.PLAYER);
         gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
@@ -81,6 +102,18 @@ public class GameServiceTest {
         Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.of(game));
         Mockito.when(modelMapper.map(any(), eq(Player.class))).thenReturn(ModelUtil.PLAYER);
         gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    }
+
+    @Test(expected = GameNotFoundException.class)
+    public void addOnePlayer_WhenGameIDDoesNotExists_ShouldThrowGameNotFoundException() {
+        Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.empty());
+        gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addOnePlayer_WhenGameIDIsNull_ShouldThrowIllegalArgumentException() {
+        Mockito.when(gameRepository.findById(null)).thenThrow(IllegalArgumentException.class);
+        gameService.addOnePlayer(null, ModelUtil.PLAYER_REQUEST_DTO);
     }
 
 }
