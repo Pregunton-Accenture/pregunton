@@ -36,9 +36,12 @@ public class PlayerService {
     @Autowired
     private ModelMapper mapper;
 
+    private static final String GAME_NOT_FOUND = "Game not found with code: ";
+    private static final String PLAYER_NOT_FOUND = "Player not found with id: ";
+
     public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found with id: " + playerId));
+                .orElseThrow(() -> new PlayerNotFoundException(PLAYER_NOT_FOUND + playerId));
 
         Question question = Question.builder()
                 .question(playerQuestion)
@@ -55,9 +58,9 @@ public class PlayerService {
 
     public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found with id: " + playerId));
+                .orElseThrow(() -> new PlayerNotFoundException(PLAYER_NOT_FOUND + playerId));
         Game game = gameRepository.findByCode(gameCode)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with code: " + gameCode));
+                .orElseThrow(() -> new GameNotFoundException(GAME_NOT_FOUND + gameCode));
 
         checkIfPlayerAlreadyLose(player);
 
@@ -76,7 +79,7 @@ public class PlayerService {
 
     public Optional<PlayerDto> getPlayer (Long playerId) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found with id: " + playerId));
+                .orElseThrow(() -> new PlayerNotFoundException(PLAYER_NOT_FOUND+ playerId));
 
         return Optional.of(mapper.map(player, PlayerDto.class));
     }
@@ -92,7 +95,7 @@ public class PlayerService {
 
     private void saveGameQuestion(String gameCode, Question question) {
         Game game = gameRepository.findByCode(gameCode)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with code: " + gameCode));
+                .orElseThrow(() -> new GameNotFoundException(GAME_NOT_FOUND + gameCode));
 
         if (Objects.isNull(game.getQuestions())) {
             game.setQuestions(Lists.newArrayList(question));
