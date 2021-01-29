@@ -24,7 +24,7 @@ public class PlayerController {
     @Autowired
     private PlayerService playerService;
 
-    @PatchMapping("/v1.0")
+    @PatchMapping("/v1.0/ask")
     @ApiOperation("Ask a question.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -37,7 +37,7 @@ public class PlayerController {
         return ResponseEntity.ok(questionDto);
     }
 
-    @PostMapping("/v1.0")
+    @PostMapping("/v1.0/guess")
     @ApiOperation("Make a guess.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),

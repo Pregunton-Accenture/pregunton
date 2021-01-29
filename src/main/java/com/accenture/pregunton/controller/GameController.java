@@ -87,7 +87,7 @@ public class GameController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/v1.0/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/v1.0/game/code/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("get the questions of a specific game")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
