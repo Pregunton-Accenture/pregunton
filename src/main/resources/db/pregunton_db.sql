@@ -19,6 +19,7 @@ USE `accenture_pregunton`;
 -- Volcando estructura para tabla accenture_pregunton.games
 CREATE TABLE IF NOT EXISTS `games` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `code` varchar(6) NOT NULL,
   `category` enum('Y','N') DEFAULT NULL,
   `hit` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `hits` (
   `id_player` bigint(20) NOT NULL DEFAULT 0,
   `is_correct` tinyint(1) NOT NULL DEFAULT 0,
   `published` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `guess` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_hits_players` (`id_player`),
   CONSTRAINT `FK_hits_players` FOREIGN KEY (`id_player`) REFERENCES `players` (`id`)
@@ -71,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `hits` (
 CREATE TABLE IF NOT EXISTS `players` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `hits_limit` int(11) DEFAULT NULL,
+  `nick_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
