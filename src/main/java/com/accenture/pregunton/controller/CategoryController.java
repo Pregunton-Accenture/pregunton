@@ -2,6 +2,7 @@ package com.accenture.pregunton.controller;
 
 import com.accenture.pregunton.model.Category;
 import com.accenture.pregunton.service.CategoryService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(name = "categories", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Category API", description = "This API has operations related to Category Controller")
 public class CategoryController {
 
     @Autowired

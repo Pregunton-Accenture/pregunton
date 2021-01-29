@@ -4,6 +4,7 @@ import com.accenture.pregunton.pojo.HitDto;
 import com.accenture.pregunton.pojo.PlayerDto;
 import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.service.PlayerService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/player")
+@Api(tags = "Player API", description = "This API has operations related to Player Controller")
 public class PlayerController {
 
     @Autowired
