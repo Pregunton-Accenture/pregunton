@@ -1,6 +1,6 @@
 package com.accenture.pregunton.service;
 
-import com.accenture.pregunton.config.MapperList;
+import com.accenture.pregunton.mapper.MapperList;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.model.*;
@@ -12,6 +12,7 @@ import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.RuleRepository;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class GameService {
                 .orElseThrow((() -> new CategoryNotFoundException("Category not found with id: " + categoryId)));
         Game game = mapper.map(gameDto, Game.class);
         game.setCategory(category);
+        game.setCode(RandomStringUtils.random(6, true, true).toUpperCase());
         gameRepository.save(game);
         saveRulesGame(game.getRules(), game);
         return game;

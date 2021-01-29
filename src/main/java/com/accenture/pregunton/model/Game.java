@@ -25,7 +25,7 @@ public class Game implements Serializable {
     private Long id;
 
     @Column(name = "code")
-    private String code = UUID.randomUUID().toString().substring(0,5).toUpperCase(Locale.ROOT);
+    private String code;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

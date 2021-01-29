@@ -11,19 +11,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(name = "categories", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "categories")
 @Api(tags = "Category API", description = "This API has operations related to Category Controller")
 public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping(name = "v1.0")
+    @GetMapping(value = "v1.0", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Retrieves a list of categories.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok"),
@@ -31,6 +32,7 @@ public class CategoryController {
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
+    @ResponseBody
     public ResponseEntity<List<Category>> getAll() {
         List<Category> categories = categoryService.getAll();
         return categories.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(categories);

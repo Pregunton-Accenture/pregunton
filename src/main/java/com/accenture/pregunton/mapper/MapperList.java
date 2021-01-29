@@ -1,4 +1,4 @@
-package com.accenture.pregunton.config;
+package com.accenture.pregunton.mapper;
 
 import org.springframework.stereotype.Component;
 
