@@ -1,6 +1,5 @@
 package com.accenture.pregunton.pojo;
 
-import com.accenture.pregunton.model.Question;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,10 +21,8 @@ public class GameDto implements Serializable {
     @NotNull(message = "The game rules cannot be missing or empty")
     private Set<RuleDto> rules;
 
-    @ApiModelProperty(notes = "The players of the game", name = "players", required = false)
-    private List<PlayerDto> players;
-
-    @ApiModelProperty(notes = "The questions the players asked", name = "questions", required = false)
-    private List<Question> questions;
+    @ApiModelProperty(notes = "The questions that the players made on the game", name = "questions")
+    @NotNull(message = "The game rules cannot be missing or empty")
+    private List<QuestionDto> questions;
 
 }

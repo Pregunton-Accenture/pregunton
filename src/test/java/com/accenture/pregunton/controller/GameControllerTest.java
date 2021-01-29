@@ -39,18 +39,15 @@ public class GameControllerTest {
     @Test
     public void whenValidInputCreateGame_thenReturns201() throws Exception {
 
-        gameService.create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID);
-
-        Mockito.verify(gameService, Mockito.times(1)).create(ModelUtil.GAME_DTO, ModelUtil.ID, ModelUtil.ID);
+        Mockito.doReturn(ModelUtil.GAME).when(gameService).create(any(), anyLong(), anyLong());
 
         mvc.perform(
                 post("/games/v1.0/")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
                     .contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
-                    .header("masterId", String.valueOf(2L))
-                    .header("categoryId", String.valueOf(2L))
+                    .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
+                    .header("masterId", ModelUtil.ID)
+                    .header("categoryId", ModelUtil.ID)
         ).andExpect(status().isCreated());
 
     }
@@ -91,7 +88,7 @@ public class GameControllerTest {
         Mockito.verify(gameService, Mockito.times(1)).delete(ModelUtil.ID);
 
         mvc.perform(
-                delete(String.format("/games/v1.0/%s", ModelUtil.ID))
+                delete("/games/v1.0/{gameId}", ModelUtil.ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
@@ -106,7 +103,7 @@ public class GameControllerTest {
         Mockito.when(gameService.getOne(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME_DTO));
 
         mvc.perform(
-                get(String.format("/games/v1.0/%s", ModelUtil.ID))
+                get("/games/v1.0/{gameId}", ModelUtil.ID)
                     .accept(MediaType.APPLICATION_JSON_VALUE)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .characterEncoding("utf-8")

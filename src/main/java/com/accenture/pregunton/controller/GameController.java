@@ -1,8 +1,11 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.pojo.GameDto;
+import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.service.GameService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -15,31 +18,33 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @Validated
+@Api(tags = "Game API", description = "This API has operations related to Game Controller")
 @RequestMapping("/games")
 public class GameController {
 
     @Autowired
     private GameService gameService;
 
-    @PostMapping(value = "/v1.0", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/v1.0")
     @ApiOperation("Creates a game.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "created"),
             @ApiResponse(code = 400, message = "Bad Request"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<Object> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId, @RequestHeader Long categoryId) {
-        gameService.create(gameDto, masterId, categoryId);
+    public ResponseEntity<String> createGame(@RequestBody GameDto gameDto, @RequestHeader Long masterId, @RequestHeader Long categoryId) {
+        Game game = gameService.create(gameDto, masterId, categoryId);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/")
                 .build()
                 .toUri();
-        return ResponseEntity.created(location).body(gameDto);
+        return ResponseEntity.created(location).body(game.getCode());
     }
 
     @DeleteMapping("/v1.0/{gameId}")
@@ -55,7 +60,7 @@ public class GameController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/v1.0/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/v1.0/game/{gameId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Obtain an specific game.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -68,7 +73,7 @@ public class GameController {
         return gameDto.map(ResponseEntity::ok).orElseGet((() -> ResponseEntity.noContent().build()));
     }
 
-    @PatchMapping(value = "/v1.0/{gameId}")
+    @PatchMapping("/v1.0/{gameId}")
     @ApiOperation("Add player to existing game.")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "No Content"),
@@ -79,6 +84,20 @@ public class GameController {
     public ResponseEntity<Void> addPlayer(@NotNull @PathVariable Long gameId, @RequestBody PlayerRequestDto playerDto) {
         gameService.addOnePlayer(gameId, playerDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/v1.0/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation("get the questions of a specific game")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 204, message = "No content"),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 404, message = "Not Found"),
+            @ApiResponse(code = 500, message = "Internal Server Error"),
+    })
+    public ResponseEntity<List<QuestionDto>> getGameQuestions(@RequestHeader String code) {
+        List<QuestionDto> questions = gameService.obtainQuestions(code);
+        return ResponseEntity.ok(questions);
     }
 
 }
