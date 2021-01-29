@@ -41,7 +41,7 @@ public class PlayerControllerTest {
         Mockito.when(playerService.askQuestion(anyLong(), anyString(), anyString())).thenReturn(ModelUtil.QUESTION_DTO);
 
         mvc.perform(
-                patch("/player/v1.0")
+                patch("/players/v1.0")
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ModelUtil.QUESTION_DTO))
@@ -56,7 +56,7 @@ public class PlayerControllerTest {
         Mockito.when(playerService.getPlayer(anyLong())).thenReturn(Optional.of(ModelUtil.PLAYER_DTO));
 
         mvc.perform(
-                get("/player/v1.0/{playerId}", ModelUtil.ID)
+                get("/players/v1.0/{playerId}", ModelUtil.ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
                 .param("playerId", String.valueOf(ModelUtil.ID))
@@ -88,7 +88,7 @@ public class PlayerControllerTest {
                 .thenReturn(ModelUtil.HIT_DTO);
 
         mvc.perform(
-                post("/player/v1.0")
+                post("/players/v1.0")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
                         .header("playerId", String.valueOf(ModelUtil.ID))
@@ -105,7 +105,7 @@ public class PlayerControllerTest {
                 .thenThrow(new GameOverException("This player already lose."));
 
         mvc.perform(
-                post("/player/v1.0")
+                post("/players/v1.0")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
                         .header("playerId", String.valueOf(ModelUtil.ID))

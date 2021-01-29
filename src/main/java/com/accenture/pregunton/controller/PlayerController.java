@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/player")
+@RequestMapping("/players")
 @Api(tags = "Player API", description = "This API has operations related to Player Controller")
 public class PlayerController {
 
