@@ -2,9 +2,11 @@ package com.accenture.pregunton.service;
 
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.mapper.MapperList;
 import com.accenture.pregunton.model.Game;
 import com.accenture.pregunton.model.Player;
 import com.accenture.pregunton.pojo.GameDto;
+import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.RuleRepository;
@@ -19,6 +21,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,6 +38,8 @@ public class GameServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private ModelMapper modelMapper;
+    @Mock
+    private MapperList mapperList;
     @InjectMocks
     private GameService gameService;
 
@@ -114,6 +120,20 @@ public class GameServiceTest {
     public void addOnePlayer_WhenGameIDIsNull_ShouldThrowIllegalArgumentException() {
         Mockito.when(gameRepository.findById(null)).thenThrow(IllegalArgumentException.class);
         gameService.addOnePlayer(null, ModelUtil.PLAYER_REQUEST_DTO);
+    }
+
+    @Test
+    public void obtainQuestions_WhenSendingValidGameCode_ShouldReturnAListOfQuestions() {
+        Mockito.when(gameRepository.findByCode(ModelUtil.CODE)).thenReturn(Optional.of(ModelUtil.GAME));
+        Mockito.when(mapperList.mapToDtoList(Stream.of(ModelUtil.QUESTION).collect(Collectors.toList()), o -> modelMapper.map(o, QuestionDto.class)))
+                .thenReturn(Stream.of(ModelUtil.QUESTION_DTO).collect(Collectors.toList()));
+        gameService.obtainQuestions(ModelUtil.CODE);
+    }
+
+    @Test(expected = GameNotFoundException.class)
+    public void obtainQuestions_WhendSendingInvalidGameCode_ShouldThrowGameNotFoundException() {
+        Mockito.when(gameRepository.findById(ModelUtil.ID)).thenReturn(Optional.empty());
+        gameService.obtainQuestions(ModelUtil.CODE);
     }
 
 }

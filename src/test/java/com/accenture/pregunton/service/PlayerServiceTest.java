@@ -1,5 +1,6 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.model.Game;
@@ -74,6 +75,18 @@ public class PlayerServiceTest {
         Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION)).thenReturn(ModelUtil.QUESTION_DTO);
     }
 
+    @Test(expected = PlayerNotFoundException.class)
+    public void askQuestion_WhenSendingInvalidId_ShouldThrowPlayerNotFoundException() {
+        Mockito.when(playerRepository.findById(any())).thenThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID));
+        playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+    }
+
+    @Test(expected = GameNotFoundException.class)
+    public void askQuestion_WhenSavingTheQuestionsOfTheGameAndTheGameDontExist_ShouldThrowGameNotFoundException() {
+        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
+        playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+    }
+
     @Test
     public void getPlayer_whenSendingValidId_ShouldReturnAPlayer() {
         Optional<PlayerDto> playerDto = playerService.getPlayer(ModelUtil.ID);
@@ -110,6 +123,18 @@ public class PlayerServiceTest {
 
         Mockito.doThrow(new GameOverException("This player already lose."))
                 .when(playerService).makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+    }
+
+    @Test(expected = PlayerNotFoundException.class)
+    public void makeAGuess_IfThePlayerMakeAGuessAndDontExist_ShouldThrowPlayerNotFoundException() {
+        Mockito.when(playerRepository.findById(any())).thenThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID));
+        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+    }
+
+    @Test(expected = GameNotFoundException.class)
+    public void makeAGuess_IfThePlayerMakeAGuessAndTheGameDontExist_ShouldThrowGameNotFoundException() {
+        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
+        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
-import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -37,7 +39,7 @@ public class GameControllerTest {
     private GameService gameService;
 
     @Test
-    public void whenValidInputCreateGame_thenReturns201() throws Exception {
+    public void createGame_WhenValidInputCreateGame_ThenReturns201() throws Exception {
 
         Mockito.doReturn(ModelUtil.GAME).when(gameService).create(any(), anyLong(), anyLong());
 
@@ -53,37 +55,24 @@ public class GameControllerTest {
     }
 
     @Test
-    public void whenNotValidInputCreateGame_thenReturns400() throws Exception{
+    public void createGame_WhenSendingInvalidCategoryId_ShouldThrowCategoryNotFoundException() throws Exception {
+
+        Mockito.when(gameService.create(any(), anyLong(), anyLong()))
+                .thenThrow(new CategoryNotFoundException("Category not found"));
 
         mvc.perform(
                 post("/games/v1.0/")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-        ).andExpect(status().isBadRequest());
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8")
+                    .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
+                    .header("masterId", ModelUtil.ID)
+                    .header("categoryId", ModelUtil.ID)
+        ).andExpect(status().is4xxClientError());
 
     }
 
     @Test
-    public void whenThrowException_thenReturns500() throws Exception {
-
-        Mockito.doThrow(new RuntimeException("500")).when(gameService).create(any(GameDto.class), anyLong(), anyLong());
-
-        mvc.perform(
-                post("/games/v1.0/")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("masterId", String.valueOf(2L))
-                        .header("categoryId", String.valueOf(2L))
-                        .characterEncoding("utf-8")
-        ).andExpect(status().is5xxServerError());
-
-    }
-
-    @Test
-    public void whenDeletingGame_thenReturn204() throws Exception {
+    public void deleteGame_WhenDeletingGame_ThenReturn204() throws Exception {
         gameService.delete(ModelUtil.ID);
         Mockito.verify(gameService, Mockito.times(1)).delete(ModelUtil.ID);
 
@@ -98,7 +87,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void whenGetAGame_thenReturns200() throws Exception {
+    public void obtainGame_WhenGetAGame_ThenReturns200() throws Exception {
 
         Mockito.when(gameService.getOne(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME_DTO));
 
@@ -138,6 +127,35 @@ public class GameControllerTest {
                         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
                         .characterEncoding("utf-8")
         ).andExpect(status().is2xxSuccessful());
+
+    }
+
+    @Test
+    public void getGameQuestions_WhenSendingValidCodeOfAGame_ShouldReturn200() throws Exception {
+
+        Mockito.when(gameService.obtainQuestions(ModelUtil.CODE))
+                .thenReturn(Stream.of(ModelUtil.QUESTION_DTO).collect(Collectors.toList()));
+
+        mvc.perform(
+                get("/games/v1.0/{code}", ModelUtil.CODE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8")
+                    .header("code", ModelUtil.CODE)
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void getGameQuestions_WhenSendingInvalidCodeOfAGame_ShouldThrowGameNotFoundException() throws Exception {
+
+        Mockito.when(gameService.obtainQuestions(any())).thenThrow(new GameNotFoundException("Game Not Found."));
+
+        mvc.perform(
+                get("/games/v1.0/{code}", ModelUtil.CODE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .header("code", ModelUtil.CODE)
+        ).andExpect(status().is4xxClientError());
 
     }
 

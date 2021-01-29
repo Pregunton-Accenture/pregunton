@@ -115,4 +115,19 @@ public class PlayerControllerTest {
 
     }
 
+    @Test
+    public void obtainPlayer_WhenSendinInvalidPlayerId_ShouldThrowPlayerNotFoundException() throws Exception {
+
+        Mockito.when(playerService.getPlayer(any()))
+                .thenThrow(new PlayerNotFoundException("Player not found."));
+
+        mvc.perform(
+                get("/players/v1.0/{playerId}", ModelUtil.ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8")
+                    .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
+                    .param("playerId", String.valueOf(ModelUtil.ID))
+        ).andExpect(status().is4xxClientError());
+    }
+
 }
