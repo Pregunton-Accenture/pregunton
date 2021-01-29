@@ -21,7 +21,7 @@ I will provide a list with the depedencies and their download link:
 ## Installation
 ___
 1. Open your command prompt and go to a root projects folder.
-2. Then clone the project with ```git clone https://github.com/Popovich26/pregunton.git``` command.
+2. Then clone the project with ```git clone https://github.com/Pregunton-Accenture/pregunton.git``` command.
 3. Execute the pregunton_db.sql in ../pregunton/src/main/resources/db/pregunton_db.sql on MariaDB.
 4. Create a new file named: ```database.properties``` into ../pregunton/src/main/resources/ with the following data:
     * spring.datasource.url=jdbc:mariadb://localhost:3306/accenture_pregunton
