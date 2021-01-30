@@ -21,8 +21,10 @@ CREATE TABLE IF NOT EXISTS `games` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `code` varchar(6) NOT NULL,
   `category` enum('Y','N') DEFAULT NULL,
+  `rules_id` bigint(20) NOT NULL,
   `hit` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_games_rules_1` FOREIGN KEY(`rules_id`) REFERENCES `rules`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
@@ -96,12 +98,9 @@ CREATE TABLE IF NOT EXISTS `questions` (
 -- Volcando estructura para tabla accenture_pregunton.rules
 CREATE TABLE IF NOT EXISTS `rules` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `game_id` bigint(20) NOT NULL DEFAULT 0,
-  `name_rule` varchar(255) DEFAULT NULL,
-  `value` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_rules_games` (`id_game`),
-  CONSTRAINT `FK_rules_games` FOREIGN KEY (`id_game`) REFERENCES `games` (`id`)
+  `hit_limit` int DEFAULT 5,
+  `question_limit` int DEFAULT 10,
+  PRIMARY KEY (`ìd`),
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Volcando estructura para tabla accenture_pregunton.rules

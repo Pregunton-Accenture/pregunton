@@ -19,7 +19,7 @@ public class GameDto implements Serializable {
 
     @ApiModelProperty(notes = "The rules of the game", name = "rules", required = true)
     @NotNull(message = "The game rules cannot be missing or empty")
-    private Set<RuleDto> rules;
+    private RulesDto rules;
 
     @ApiModelProperty(notes = "The questions that the players made on the game", name = "questions")
     @NotNull(message = "The game rules cannot be missing or empty")

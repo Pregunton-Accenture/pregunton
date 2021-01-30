@@ -1,6 +1,6 @@
 package com.accenture.pregunton.service;
 
-import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.model.Game;
@@ -81,9 +81,9 @@ public class PlayerServiceTest {
         playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
     }
 
-    @Test(expected = GameNotFoundException.class)
+    @Test(expected = GameCodeNotFoundException.class)
     public void askQuestion_WhenSavingTheQuestionsOfTheGameAndTheGameDontExist_ShouldThrowGameNotFoundException() {
-        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
+        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameCodeNotFoundException(ModelUtil.CODE));
         playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
     }
 
@@ -131,9 +131,9 @@ public class PlayerServiceTest {
         playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
     }
 
-    @Test(expected = GameNotFoundException.class)
+    @Test(expected = GameCodeNotFoundException.class)
     public void makeAGuess_IfThePlayerMakeAGuessAndTheGameDontExist_ShouldThrowGameNotFoundException() {
-        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
+        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameCodeNotFoundException(ModelUtil.CODE));
         playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
     }
 

@@ -1,7 +1,7 @@
 package com.accenture.pregunton.controller.advice;
 
 import com.accenture.pregunton.exception.CategoryNotFoundException;
-import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.exception.GameIdNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.util.SimpleResponse;
@@ -23,8 +23,8 @@ public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(GameNotFoundException.class)
-    protected ResponseEntity<Object> gameNotFoundHandler(GameNotFoundException ex) {
+    @ExceptionHandler(GameIdNotFoundException.class)
+    protected ResponseEntity<Object> gameNotFoundHandler(GameIdNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(SimpleResponse.builder()
                         .message(ex.getMessage())

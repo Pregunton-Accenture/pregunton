@@ -19,8 +19,8 @@ public class ModelUtil {
     public static final String DUMMY_CATEGORY = "SOME CATEGORY";
     public static final String DUMMY_QUESTION = "SOME QUESTION";
     public static final String CORRECT_GUESS = "John Doe";
-    public static final String DUMMY_RULE = "Solo 3 palabras por pregunta";
-    public static final String RULE_VALUE = "3";
+    public static final Integer DUMMY_HIT_LIMIT = 5;
+    public static final Integer DUMMY_QUESTION_LIMIT = 10;
     public static final String HIT_VALUE = "John Doe";
     public static final String NICK_NAME = "Ruso";
     public static final String CODE = "ABC12";
@@ -30,7 +30,7 @@ public class ModelUtil {
     public static final Question QUESTION = createQuestion();
     public static final Player PLAYER = createPlayer();
     public static final Hit HIT = createHit();
-    public static final Rule RULE = createRule();
+    public static final Rules RULES = createRules();
     public static final Game GAME = createGame();
 
     //Dtos
@@ -47,7 +47,7 @@ public class ModelUtil {
                 .category(CATEGORY)
                 .code(CODE)
                 .questions(Stream.of(QUESTION).collect(Collectors.toList()))
-                .rules(Stream.of(RULE).collect(Collectors.toSet()))
+                .rules(RULES)
                 .players(Stream.of(PLAYER).collect(Collectors.toList()))
                 .hit(HIT_VALUE)
                 .build();
@@ -71,11 +71,10 @@ public class ModelUtil {
                 .build();
     }
 
-    public static Rule createRule() {
-        return Rule.builder()
-                .id(ID)
-                .nameRule(DUMMY_RULE)
-                .value(RULE_VALUE)
+    public static Rules createRules() {
+        return Rules.builder()
+                .hitLimit(DUMMY_HIT_LIMIT)
+                .questionLimit(DUMMY_QUESTION_LIMIT)
                 .build();
     }
 
