@@ -18,7 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,7 +103,7 @@ public class GameControllerTest {
         Mockito.when(gameService.getOne(ModelUtil.ID)).thenReturn(Optional.of(ModelUtil.GAME_DTO));
 
         mvc.perform(
-                get("/games/v1.0/{gameId}", ModelUtil.ID)
+                get("/games/v1.0/game/{gameId}", ModelUtil.ID)
                     .accept(MediaType.APPLICATION_JSON_VALUE)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .characterEncoding("utf-8")

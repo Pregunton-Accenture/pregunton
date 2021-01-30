@@ -4,7 +4,6 @@ import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.service.PlayerService;
 import com.accenture.pregunton.util.ModelUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;

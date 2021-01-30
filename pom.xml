@@ -10,8 +10,8 @@
 	</parent>
 	<groupId>com.accenture</groupId>
 	<artifactId>pregunton</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<version>1.0.1</version>
+	<packaging>war</packaging>
 	<name>pregunton</name>
 	<description>Juego el Pregunton</description>
 
@@ -143,7 +143,6 @@
 						<configuration>
 							<rules>
 								<rule>
-									<element>PACKAGE</element>
 									<limits>
 										<limit>
 											<counter>LINE</counter>
