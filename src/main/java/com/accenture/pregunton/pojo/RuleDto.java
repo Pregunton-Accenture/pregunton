@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Getter
 @Setter
-public class RuleDto {
+public class RuleDto implements Serializable {
 
     @ApiModelProperty(notes = "The rules of the game", name = "rules", required = true)
     @NotNull(message = "The name rule cannot be missing or empty")

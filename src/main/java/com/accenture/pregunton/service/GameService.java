@@ -1,8 +1,8 @@
 package com.accenture.pregunton.service;
 
-import com.accenture.pregunton.mapper.MapperList;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
+import com.accenture.pregunton.mapper.MapperList;
 import com.accenture.pregunton.model.*;
 import com.accenture.pregunton.pojo.Answer;
 import com.accenture.pregunton.pojo.GameDto;
@@ -34,9 +34,13 @@ public class GameService {
     @Autowired
     private MapperList mapperList;
 
+    private static final String GAME_ID_NOT_FOUND = "Game not found with id: ";
+    private static final String GAME_CODE_NOT_FOUND = "Game not found with code: ";
+    private static final String CATEGORY_ID_NOT_FOUND = "Category not found with id: ";
+
     public Game create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException{
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow((() -> new CategoryNotFoundException("Category not found with id: " + categoryId)));
+                .orElseThrow((() -> new CategoryNotFoundException(CATEGORY_ID_NOT_FOUND + categoryId)));
         Game game = mapper.map(gameDto, Game.class);
         game.setCategory(category);
         game.setCode(RandomStringUtils.random(6, true, true).toUpperCase());
@@ -47,19 +51,19 @@ public class GameService {
 
     public void delete(Long id) {
         Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with id: " + id));
+                .orElseThrow(() -> new GameNotFoundException(GAME_ID_NOT_FOUND + id));
         gameRepository.delete(game);
     }
 
     public Optional<GameDto> getOne(Long id) {
         Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with id: " + id));
+                .orElseThrow(() -> new GameNotFoundException(GAME_ID_NOT_FOUND + id));
         return Optional.of(mapper.map(game, GameDto.class));
     }
 
     public void addOnePlayer(Long gameId, PlayerRequestDto playerDto) {
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with id: " + gameId));
+                .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameId));
 
         Player player = mapper.map(playerDto, Player.class);
 
@@ -74,7 +78,7 @@ public class GameService {
 
     public List<QuestionDto> obtainQuestions(String gameCode) {
         Game game = gameRepository.findByCode(gameCode)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with code: " + gameCode));
+                .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameCode));
 
         List<Question> filterQuestions = game.getQuestions()
                 .stream()

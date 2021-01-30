@@ -68,6 +68,7 @@ public class GameController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
+    @ResponseBody
     public ResponseEntity<GameDto> obtainGame(@NotNull @PathVariable Long gameId) {
         Optional<GameDto> gameDto = gameService.getOne(gameId);
         return gameDto.map(ResponseEntity::ok).orElseGet((() -> ResponseEntity.noContent().build()));
@@ -86,7 +87,7 @@ public class GameController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/v1.0/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/v1.0/game/code/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("get the questions of a specific game")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -95,6 +96,7 @@ public class GameController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
+    @ResponseBody
     public ResponseEntity<List<QuestionDto>> getGameQuestions(@RequestHeader String code) {
         List<QuestionDto> questions = gameService.obtainQuestions(code);
         return ResponseEntity.ok(questions);
