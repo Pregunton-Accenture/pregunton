@@ -22,8 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,7 +107,7 @@ public class GameControllerTest {
     Mockito.when(gameService.getOne(ModelUtil.ID))
         .thenReturn(Optional.of(ModelUtil.GAME_DTO));
 
-    mvc.perform(get("/games/v1.0/game/{gameId}", ModelUtil.ID).accept(MediaType.APPLICATION_JSON_VALUE)
+    mvc.perform(get("/games/v1.0/{gameId}", ModelUtil.ID).accept(MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .param("gameId", String.valueOf(ModelUtil.ID))
@@ -144,28 +143,27 @@ public class GameControllerTest {
 
   @Test
   public void getGameQuestions_WhenSendingValidCodeOfAGame_ShouldReturn200() throws Exception {
-
-    Mockito.when(gameService.obtainQuestions(ModelUtil.CODE))
+    Mockito.when(gameService.obtainQuestions(eq(ModelUtil.CODE), eq(true)))
         .thenReturn(Stream.of(ModelUtil.QUESTION_DTO)
             .collect(Collectors.toList()));
 
-    mvc.perform(get("/games/v1.0/{code}", ModelUtil.CODE).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/games/v1.0/code/{code}", ModelUtil.CODE).contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
-        .header("code", ModelUtil.CODE))
+        .param("all", "true"))
         .andExpect(status().isOk());
 
   }
 
   @Test
   public void getGameQuestions_WhenSendingInvalidCodeOfAGame_ShouldThrowGameNotFoundException() throws Exception {
+    String wrongCode = "WRONG_CODE";
+    Mockito.when(gameService.obtainQuestions(eq(wrongCode), eq(false)))
+        .thenThrow(new GameCodeNotFoundException(wrongCode));
 
-    Mockito.when(gameService.obtainQuestions(any()))
-        .thenThrow(new GameCodeNotFoundException(ModelUtil.CODE));
-
-    mvc.perform(get("/games/v1.0/code/{code}", ModelUtil.CODE).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/games/v1.0/code/{code}", wrongCode).contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
-        .header("code", ModelUtil.CODE))
-        .andExpect(status().is4xxClientError());
+        .param("all", "false"))
+        .andExpect(status().isNotFound());
 
   }
 

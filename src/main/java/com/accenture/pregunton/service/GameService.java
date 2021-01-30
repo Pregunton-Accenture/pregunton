@@ -18,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,18 +83,26 @@ public class GameService {
     gameRepository.save(game);
   }
 
-  public List<QuestionDto> obtainQuestions(String gameCode) {
+  public List<QuestionDto> obtainQuestions(String gameCode, boolean withAllQuestion) {
     Game game = gameRepository.findByCode(gameCode)
         .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
 
     List<Question> filterQuestions = game.getQuestions()
         .stream()
-        .filter(question -> question.getAnswer()
-            .equals(Answer.SIN_RESPUESTA))
+        .filter(getQuestionsPredicate(withAllQuestion))
         .collect(Collectors.toList());
 
-    return Optional.ofNullable(
-        mapperList.mapToDtoList(filterQuestions, question -> mapper.map(question, QuestionDto.class)))
-        .orElse(Collections.emptyList());
+    return mapperList.mapToDtoList(filterQuestions, question -> mapper.map(question, QuestionDto.class));
+  }
+
+  private Predicate<Question> getQuestionsPredicate(boolean withAllQuestion) {
+    Predicate<Question> predicate;
+    if (withAllQuestion) {
+      predicate = question -> true;
+    } else {
+      predicate = question -> question.getAnswer()
+          .equals(Answer.SIN_RESPUESTA);
+    }
+    return predicate;
   }
 }

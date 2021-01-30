@@ -31,6 +31,7 @@ public class ModelUtil {
     public static final Player PLAYER = createPlayer();
     public static final Hit HIT = createHit();
     public static final Rules RULES = createRules();
+    public static final Rules RULES_WITH_ID = createRules();
     public static final Game GAME = createGame();
 
     //Dtos
@@ -73,9 +74,16 @@ public class ModelUtil {
 
     public static Rules createRules() {
         return Rules.builder()
-                .hitLimit(DUMMY_HIT_LIMIT)
-                .questionLimit(DUMMY_QUESTION_LIMIT)
-                .build();
+            .hitLimit(DUMMY_HIT_LIMIT)
+            .questionLimit(DUMMY_QUESTION_LIMIT)
+            .build();
+    }
+    public static Rules createRulesWithID() {
+        return Rules.builder()
+            .id(1L)
+            .hitLimit(DUMMY_HIT_LIMIT)
+            .questionLimit(DUMMY_QUESTION_LIMIT)
+            .build();
     }
 
     public static Category createCategory() {
