@@ -1,13 +1,16 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.model.Game;
+import com.accenture.model.Player;
+import com.accenture.model.Question;
+import com.accenture.pojo.Answer;
+import com.accenture.pojo.HitDto;
+import com.accenture.pojo.PlayerDto;
+import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
+import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
-import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.model.Player;
-import com.accenture.pregunton.pojo.HitDto;
-import com.accenture.pregunton.pojo.PlayerDto;
-import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.HitRepository;
 import com.accenture.pregunton.repository.PlayerRepository;
@@ -22,6 +25,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
@@ -29,112 +34,155 @@ import static org.mockito.ArgumentMatchers.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlayerServiceTest {
 
-    @InjectMocks
-    private PlayerService playerService;
-    @Mock
-    private ModelMapper modelMapper;
-    @Mock
-    private PlayerRepository playerRepository;
-    @Mock
-    private HitRepository hitRepository;
-    @Mock
-    private GameRepository gameRepository;
+  @InjectMocks
+  private PlayerService playerService;
+  @Mock
+  private ModelMapper modelMapper;
+  @Mock
+  private PlayerRepository playerRepository;
+  @Mock
+  private HitRepository hitRepository;
+  @Mock
+  private GameRepository gameRepository;
 
-    @Before
-    public void setup() {
-        Mockito.when(playerRepository.findById(anyLong())).thenReturn(Optional.of(ModelUtil.PLAYER));
+  @Before
+  public void setup() {
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(ModelUtil.PLAYER));
 
-        Mockito.when(modelMapper.map(ModelUtil.QUESTION, QuestionDto.class)).thenReturn(ModelUtil.QUESTION_DTO);
-        Mockito.when(modelMapper.map(ModelUtil.PLAYER, PlayerDto.class)).thenReturn(ModelUtil.PLAYER_DTO);
-        Mockito.when(modelMapper.map(ModelUtil.HIT, HitDto.class)).thenReturn(ModelUtil.HIT_DTO);
-    }
+    Mockito.when(modelMapper.map(ModelUtil.QUESTION, QuestionDto.class))
+        .thenReturn(ModelUtil.QUESTION_DTO); Mockito.when(modelMapper.map(ModelUtil.PLAYER, PlayerDto.class))
+        .thenReturn(ModelUtil.PLAYER_DTO); Mockito.when(modelMapper.map(ModelUtil.HIT, HitDto.class))
+        .thenReturn(ModelUtil.HIT_DTO);
+  }
 
-    @Test
-    public void askQuestion_ShouldAddAQuestionToTheGameAndThePlayer() {
-        Mockito.when(gameRepository.findByCode(anyString())).thenReturn(Optional.of(ModelUtil.GAME));
+  @Test
+  public void askQuestion_ShouldAddAQuestionToTheGameAndThePlayer() {
+    Mockito.when(gameRepository.findByCode(anyString()))
+        .thenReturn(Optional.of(ModelUtil.GAME));
 
-        playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
 
-        Mockito.verify(playerRepository, Mockito.times(1)).save(ModelUtil.PLAYER);
-        Mockito.verify(gameRepository, Mockito.times(1)).save(ModelUtil.GAME);
+    Mockito.verify(playerRepository, Mockito.times(1))
+        .save(ModelUtil.PLAYER);
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .save(ModelUtil.GAME);
+  }
 
-        Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION)).thenReturn(ModelUtil.QUESTION_DTO);
-    }
+  @Test
+  public void askQuestion_IfTheGameHasNotQuestionYet_ShouldAddNewQuestion() {
+    Game game = Game.builder()
+        .build();
 
-    @Test
-    public void askQuestion_IfTheGameHasNotQuestionYet_ShouldAddNewQuestion() {
-        Game game = Game.builder().build();
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(game));
 
-        Mockito.when(gameRepository.findByCode(anyString())).thenReturn(Optional.of(game));
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
 
-        playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+    Mockito.verify(playerRepository, Mockito.times(1))
+        .save(ModelUtil.PLAYER);
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .save(game);
+  }
 
-        Mockito.verify(playerRepository, Mockito.times(1)).save(ModelUtil.PLAYER);
-        Mockito.verify(gameRepository, Mockito.times(1)).save(game);
+  @Test(expected = PlayerNotFoundException.class)
+  public void askQuestion_WhenSendingInvalidId_ShouldThrowPlayerNotFoundException() {
+    Mockito.when(playerRepository.findById(any()))
+        .thenThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID));
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+  }
 
-        Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION)).thenReturn(ModelUtil.QUESTION_DTO);
-    }
+  @Test(expected = GameNotFoundException.class)
+  public void askQuestion_WhenSavingTheQuestionsOfTheGameAndTheGameDontExist_ShouldThrowGameNotFoundException() {
+    Mockito.when(gameRepository.findByCode(any()))
+        .thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+  }
 
-    @Test(expected = PlayerNotFoundException.class)
-    public void askQuestion_WhenSendingInvalidId_ShouldThrowPlayerNotFoundException() {
-        Mockito.when(playerRepository.findById(any())).thenThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID));
-        playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
-    }
+  @Test(expected = LastQuestionNotAnswerException.class)
+  public void askQuestion_WhenSendingAQuestionAndTheLastOneHasBeenNotAnswerYet_ShouldThrowLastQuestionNotAnswerException() {
+    Player player = ModelUtil.createPlayer();
+    player.setQuestions(Stream.of(Question.builder()
+        .answer(Answer.SIN_RESPUESTA)
+        .build())
+        .collect(Collectors.toList()));
 
-    @Test(expected = GameNotFoundException.class)
-    public void askQuestion_WhenSavingTheQuestionsOfTheGameAndTheGameDontExist_ShouldThrowGameNotFoundException() {
-        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
-        playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
-    }
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(player));
 
-    @Test
-    public void getPlayer_whenSendingValidId_ShouldReturnAPlayer() {
-        Optional<PlayerDto> playerDto = playerService.getPlayer(ModelUtil.ID);
-        Mockito.when(playerService.getPlayer(anyLong())).thenReturn(Optional.of(ModelUtil.PLAYER_DTO));
+    Game game = ModelUtil.createGame();
+    game.setPlayers(Stream.of(player).collect(Collectors.toList()));
 
-        assertEquals(ModelUtil.PLAYER_DTO, playerDto.get());
-    }
+    Mockito.when(gameRepository.findByCode(anyString()))
+        .thenReturn(Optional.of(game));
 
-    @Test(expected = PlayerNotFoundException.class)
-    public void getPlayer_WhenSendingInvalidID_ShouldReturnExpcetion() {
-        playerService.getPlayer(any());
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
 
-        Mockito.doThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID))
-                .when(playerRepository).findById(anyLong());
-    }
+    Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION))
+        .thenReturn(ModelUtil.QUESTION_DTO);
 
-    @Test
-    public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrect_ShouldReturnTrue() {
-        Mockito.when(gameRepository.findByCode(anyString())).thenReturn(Optional.of(ModelUtil.GAME));
-        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
-        Mockito.when(playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS)).thenReturn(ModelUtil.HIT_DTO);
-    }
+    Mockito.verify(playerRepository, Mockito.times(1))
+        .save(ModelUtil.PLAYER);
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .save(ModelUtil.GAME);
+  }
 
-    @Test(expected = GameOverException.class)
-    public void makeAGuess_IfThePlayerMakeAGuessAndDontHaveMoreChances_ShouldReturnGameOverException() {
-        Mockito.when(gameRepository.findByCode(anyString())).thenReturn(Optional.of(ModelUtil.GAME));
+  @Test
+  public void getPlayer_whenSendingValidId_ShouldReturnAPlayer() {
+    Optional<PlayerDto> playerDto = playerService.getPlayer(ModelUtil.ID);
+    Mockito.when(playerService.getPlayer(anyLong()))
+        .thenReturn(Optional.of(ModelUtil.PLAYER_DTO));
 
-        Player player = ModelUtil.createPlayer();
-        player.setHitsLimit(0);
+    assertEquals(ModelUtil.PLAYER_DTO, playerDto.get());
+  }
 
-        Mockito.when(playerRepository.findById(anyLong())).thenReturn(Optional.of(player));
+  @Test(expected = PlayerNotFoundException.class)
+  public void getPlayer_WhenSendingInvalidID_ShouldReturnExpcetion() {
+    playerService.getPlayer(any());
 
-        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+    Mockito.doThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID))
+        .when(playerRepository)
+        .findById(anyLong());
+  }
 
-        Mockito.doThrow(new GameOverException("This player already lose."))
-                .when(playerService).makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
-    }
+  @Test
+  public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrect_ShouldReturnTrue() {
+    Mockito.when(gameRepository.findByCode(anyString()))
+        .thenReturn(Optional.of(ModelUtil.GAME));
+    playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+    Mockito.when(playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS))
+        .thenReturn(ModelUtil.HIT_DTO);
+  }
 
-    @Test(expected = PlayerNotFoundException.class)
-    public void makeAGuess_IfThePlayerMakeAGuessAndDontExist_ShouldThrowPlayerNotFoundException() {
-        Mockito.when(playerRepository.findById(any())).thenThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID));
-        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
-    }
+  @Test(expected = GameOverException.class)
+  public void makeAGuess_IfThePlayerMakeAGuessAndDontHaveMoreChances_ShouldReturnGameOverException() {
+    Mockito.when(gameRepository.findByCode(anyString()))
+        .thenReturn(Optional.of(ModelUtil.GAME));
 
-    @Test(expected = GameNotFoundException.class)
-    public void makeAGuess_IfThePlayerMakeAGuessAndTheGameDontExist_ShouldThrowGameNotFoundException() {
-        Mockito.when(gameRepository.findByCode(any())).thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
-        playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
-    }
+    Player player = ModelUtil.createPlayer(); player.setHitsLimit(0);
+
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(player));
+
+    playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+
+    Mockito.doThrow(new GameOverException("This player already lose."))
+        .when(playerService)
+        .makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+  }
+
+  @Test(expected = PlayerNotFoundException.class)
+  public void makeAGuess_IfThePlayerMakeAGuessAndDontExist_ShouldThrowPlayerNotFoundException() {
+    Mockito.when(playerRepository.findById(any()))
+        .thenThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID));
+    playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+  }
+
+  @Test(expected = GameNotFoundException.class)
+  public void makeAGuess_IfThePlayerMakeAGuessAndTheGameDontExist_ShouldThrowGameNotFoundException() {
+    Mockito.when(gameRepository.findByCode(any()))
+        .thenThrow(new GameNotFoundException("Game not found with code: " + ModelUtil.CODE));
+    playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+  }
 
 }

@@ -1,13 +1,13 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.model.*;
+import com.accenture.pojo.Answer;
+import com.accenture.pojo.GameDto;
+import com.accenture.pojo.QuestionDto;
+import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameNotFoundException;
 import com.accenture.pregunton.mapper.MapperList;
-import com.accenture.pregunton.model.*;
-import com.accenture.pregunton.pojo.Answer;
-import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.QuestionDto;
-import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.RuleRepository;
@@ -23,75 +23,86 @@ import java.util.stream.Collectors;
 @Service
 public class GameService {
 
-    @Autowired
-    private GameRepository gameRepository;
-    @Autowired
-    private RuleRepository ruleRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ModelMapper mapper;
-    @Autowired
-    private MapperList mapperList;
+  @Autowired
+  private GameRepository gameRepository;
+  @Autowired
+  private RuleRepository ruleRepository;
+  @Autowired
+  private CategoryRepository categoryRepository;
+  @Autowired
+  private ModelMapper mapper;
+  @Autowired
+  private MapperList mapperList;
 
-    private static final String GAME_ID_NOT_FOUND = "Game not found with id: ";
-    private static final String GAME_CODE_NOT_FOUND = "Game not found with code: ";
-    private static final String CATEGORY_ID_NOT_FOUND = "Category not found with id: ";
+  private static final String GAME_ID_NOT_FOUND = "Game not found with id: ";
+  private static final String GAME_CODE_NOT_FOUND = "Game not found with code: ";
+  private static final String CATEGORY_ID_NOT_FOUND = "Category not found with id: ";
 
-    public Game create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException{
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow((() -> new CategoryNotFoundException(CATEGORY_ID_NOT_FOUND + categoryId)));
-        Game game = mapper.map(gameDto, Game.class);
-        game.setCategory(category);
-        game.setCode(RandomStringUtils.random(6, true, true).toUpperCase());
-        gameRepository.save(game);
-        saveRulesGame(game.getRules(), game);
-        return game;
+  public Game create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException {
+    Category category = categoryRepository.findById(categoryId)
+        .orElseThrow((() -> new CategoryNotFoundException(CATEGORY_ID_NOT_FOUND + categoryId)));
+    Game game = mapper.map(gameDto, Game.class);
+    game.setCategory(category);
+    game.setCode(RandomStringUtils.random(6, true, true).toUpperCase());
+    gameRepository.save(game);
+    saveRulesGame(game.getRules(), game);
+    return game;
+  }
+
+  public void delete(Long id) {
+    Game game = gameRepository.findById(id)
+        .orElseThrow(() -> new GameNotFoundException(GAME_ID_NOT_FOUND + id));
+    gameRepository.delete(game);
+  }
+
+  public Optional<GameDto> getOne(Long id) {
+    Game game = gameRepository.findById(id)
+        .orElseThrow(() -> new GameNotFoundException(GAME_ID_NOT_FOUND + id));
+    return Optional.of(mapper.map(game, GameDto.class));
+  }
+
+  public void addOnePlayer(Long gameId, PlayerRequestDto playerDto) {
+    Game game = gameRepository.findById(gameId)
+        .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameId));
+
+    Player player = mapper.map(playerDto, Player.class);
+
+    if (Objects.isNull(game.getPlayers())) {
+      game.setPlayers(Lists.newArrayList(player));
+    } else {
+      game.getPlayers()
+          .add(player);
     }
 
-    public void delete(Long id) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(GAME_ID_NOT_FOUND + id));
-        gameRepository.delete(game);
-    }
+    gameRepository.save(game);
+  }
 
-    public Optional<GameDto> getOne(Long id) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(GAME_ID_NOT_FOUND + id));
-        return Optional.of(mapper.map(game, GameDto.class));
-    }
+  public List<QuestionDto> obtainQuestionsWithoutAnswer(String gameCode) {
+    Game game = gameRepository.findByCode(gameCode)
+        .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameCode));
 
-    public void addOnePlayer(Long gameId, PlayerRequestDto playerDto) {
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameId));
+    List<Question> filterQuestions = game.getQuestions()
+        .stream()
+        .filter(question -> question.getAnswer()
+            .equals(Answer.SIN_RESPUESTA))
+        .collect(Collectors.toList());
 
-        Player player = mapper.map(playerDto, Player.class);
+    return Optional.ofNullable(
+        mapperList.mapToDtoList(filterQuestions, question -> mapper.map(question, QuestionDto.class)))
+        .orElse(Collections.emptyList());
+  }
 
-        if (Objects.isNull(game.getPlayers())) {
-            game.setPlayers(Lists.newArrayList(player));
-        } else {
-            game.getPlayers().add(player);
-        }
+  public List<QuestionDto> obtainAllQuestions(String gameCode) {
+    Game game = gameRepository.findByCode(gameCode)
+        .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameCode));
 
-        gameRepository.save(game);
-    }
+    return Optional.ofNullable(
+        mapperList.mapToDtoList(game.getQuestions(), question -> mapper.map(question, QuestionDto.class)))
+        .orElse(Collections.emptyList());
+  }
 
-    public List<QuestionDto> obtainQuestions(String gameCode) {
-        Game game = gameRepository.findByCode(gameCode)
-                .orElseThrow(() -> new GameNotFoundException(GAME_CODE_NOT_FOUND + gameCode));
-
-        List<Question> filterQuestions = game.getQuestions()
-                .stream()
-                .filter(question -> question.getAnswer().equals(Answer.SIN_RESPUESTA))
-                .collect(Collectors.toList());
-
-        return Optional.ofNullable(mapperList.mapToDtoList(filterQuestions,
-                question -> mapper.map(question, QuestionDto.class)))
-                .orElse(Collections.emptyList());
-    }
-
-    private void saveRulesGame(Set<Rule> rules, Game game) {
-        rules.forEach(rule -> rule.setGame(game));
-        ruleRepository.saveAll(rules);
-    }
+  private void saveRulesGame(Set<Rule> rules, Game game) {
+    rules.forEach(rule -> rule.setGame(game));
+    ruleRepository.saveAll(rules);
+  }
 }

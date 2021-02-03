@@ -1,8 +1,8 @@
 package com.accenture.pregunton.util;
 
-import com.accenture.pregunton.model.*;
-import com.accenture.pregunton.pojo.*;
-import com.accenture.pregunton.pojo.request.PlayerRequestDto;
+import com.accenture.model.*;
+import com.accenture.pojo.*;
+import com.accenture.pojo.request.PlayerRequestDto;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
@@ -27,18 +27,18 @@ public class ModelUtil {
 
     //models
     public static final Category CATEGORY = createCategory();
-    public static final Question QUESTION = createQuestion();
     public static final Player PLAYER = createPlayer();
+    public static final Question QUESTION = createQuestion();
     public static final Hit HIT = createHit();
     public static final Rule RULE = createRule();
     public static final Game GAME = createGame();
 
     //Dtos
-    public static final GameDto GAME_DTO = MODEL_MAPPER.map(GAME, GameDto.class);
     public static final PlayerDto PLAYER_DTO = MODEL_MAPPER.map(PLAYER, PlayerDto.class);
     public static final PlayerRequestDto PLAYER_REQUEST_DTO = MODEL_MAPPER.map(PLAYER, PlayerRequestDto.class);
     public static final QuestionDto QUESTION_DTO = MODEL_MAPPER.map(QUESTION, QuestionDto.class);
     public static final HitDto HIT_DTO = MODEL_MAPPER.map(HIT, HitDto.class);
+    public static final GameDto GAME_DTO = MODEL_MAPPER.map(GAME, GameDto.class);
 
 
     public static Game createGame() {
@@ -46,9 +46,12 @@ public class ModelUtil {
                 .id(ID)
                 .category(CATEGORY)
                 .code(CODE)
-                .questions(Stream.of(QUESTION).collect(Collectors.toList()))
-                .rules(Stream.of(RULE).collect(Collectors.toSet()))
-                .players(Stream.of(PLAYER).collect(Collectors.toList()))
+                .questions(Stream.of(QUESTION)
+                    .collect(Collectors.toList()))
+                .rules(Stream.of(RULE)
+                    .collect(Collectors.toSet()))
+                .players(Stream.of(PLAYER)
+                    .collect(Collectors.toList()))
                 .hit(HIT_VALUE)
                 .build();
     }
@@ -58,7 +61,8 @@ public class ModelUtil {
                 .id(ID)
                 .hitsLimit(HITS_LIMIT)
                 .nickName(NICK_NAME)
-                .questions(Stream.of(QUESTION).collect(Collectors.toList()))
+                .questions(Stream.of(QUESTION)
+                    .collect(Collectors.toList()))
                 .build();
     }
 
@@ -67,7 +71,8 @@ public class ModelUtil {
                 .id(ID)
                 .question(DUMMY_QUESTION)
                 .published(LocalDateTime.now())
-                .answer(Answer.SIN_RESPUESTA)
+                .answer(Answer.SI)
+                .player(PLAYER)
                 .build();
     }
 

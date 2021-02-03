@@ -1,6 +1,6 @@
 package com.accenture.pregunton.controller;
 
-import com.accenture.pregunton.model.Category;
+import com.accenture.model.Category;
 import com.accenture.pregunton.service.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -49,11 +49,26 @@ public class CategoryControllerTest {
 
   @Test
   public void getAll_When5CategoriesSetOnDB_ShouldReturnsAListWithAllCategoriesAnd200() throws Exception {
-    CATEGORY_LIST.add(Category.builder().id(1L).name(PERSONAJES).build());
-    CATEGORY_LIST.add(Category.builder().id(2L).name(PELICULAS).build());
-    CATEGORY_LIST.add(Category.builder().id(3L).name(SERIES).build());
-    CATEGORY_LIST.add(Category.builder().id(4L).name(LUGARES).build());
-    CATEGORY_LIST.add(Category.builder().id(5L).name(ANIMALES).build());
+    CATEGORY_LIST.add(Category.builder()
+        .id(1L)
+        .name(PERSONAJES)
+        .build());
+    CATEGORY_LIST.add(Category.builder()
+        .id(2L)
+        .name(PELICULAS)
+        .build());
+    CATEGORY_LIST.add(Category.builder()
+        .id(3L)
+        .name(SERIES)
+        .build());
+    CATEGORY_LIST.add(Category.builder()
+        .id(4L)
+        .name(LUGARES)
+        .build());
+    CATEGORY_LIST.add(Category.builder()
+        .id(5L)
+        .name(ANIMALES)
+        .build());
 
     when(categoryService.getAll()).thenReturn(CATEGORY_LIST);
 

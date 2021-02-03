@@ -9,9 +9,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class PreguntonApplicationTest {
 
-    @Test
-    public void contextLoads() {
-        PreguntonApplication.main(new String[] {});
-    }
+  @Test
+  public void contextLoads() {
+    PreguntonApplication.main(new String[]{});
+  }
 
 }

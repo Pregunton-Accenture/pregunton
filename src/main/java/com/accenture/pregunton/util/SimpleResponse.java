@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class SimpleResponse {
 
-    private String message;
-    private HttpStatus status;
+  private String message;
+  private HttpStatus status;
 
 }
