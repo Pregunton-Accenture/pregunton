@@ -1,28 +1,33 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.model.Game;
+import com.accenture.model.Hit;
+import com.accenture.model.Player;
+import com.accenture.model.Question;
+import com.accenture.pojo.Answer;
+import com.accenture.pojo.HitDto;
+import com.accenture.pojo.PlayerDto;
+import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
+import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
-import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.model.Hit;
-import com.accenture.pregunton.model.Player;
-import com.accenture.pregunton.model.Question;
-import com.accenture.pregunton.pojo.Answer;
-import com.accenture.pregunton.pojo.HitDto;
-import com.accenture.pregunton.pojo.PlayerDto;
-import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.HitRepository;
 import com.accenture.pregunton.repository.PlayerRepository;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PlayerService {
@@ -39,6 +44,8 @@ public class PlayerService {
   public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
+    Game game = gameRepository.findByCode(gameCode)
+        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
 
     Question question = Question.builder()
         .question(playerQuestion)
@@ -47,8 +54,12 @@ public class PlayerService {
         .player(player)
         .build();
 
+    if (checkIfPlayerQuestionHasBeenResponded(player, game)) {
+      throw new LastQuestionNotAnswerException(player.getNickName());
+    }
+
     playerRepository.save(player);
-    saveGameQuestion(gameCode, question);
+    saveGameQuestion(game, question);
 
     return mapper.map(question, QuestionDto.class);
   }
@@ -91,10 +102,7 @@ public class PlayerService {
     }
   }
 
-  private void saveGameQuestion(String gameCode, Question question) {
-    Game game = gameRepository.findByCode(gameCode)
-        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
-
+  private void saveGameQuestion(Game game, Question question) {
     if (Objects.isNull(game.getQuestions())) {
       game.setQuestions(Lists.newArrayList(question));
     } else {
@@ -105,4 +113,24 @@ public class PlayerService {
     gameRepository.save(game);
   }
 
+  private boolean checkIfPlayerQuestionHasBeenResponded(Player player, Game game) {
+    if (Objects.isNull(game.getQuestions())) {
+      return false;
+    } else {
+      List<Question> sortedQuestions = game.getQuestions()
+          .stream()
+          .filter(question -> question.getPlayer()
+              .getId()
+              .equals(player.getId()))
+          .sorted(Comparator.comparing(Question::getPublished))
+          .collect(Collectors.toList());
+      if (sortedQuestions.isEmpty()) {
+        return false;
+      } else {
+        Question lastQuestion = Iterables.getLast(sortedQuestions);
+        return lastQuestion.getAnswer()
+            .equals(Answer.SIN_RESPUESTA);
+      }
+    }
+  }
 }

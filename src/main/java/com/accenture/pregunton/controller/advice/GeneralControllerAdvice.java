@@ -1,6 +1,11 @@
 package com.accenture.pregunton.controller.advice;
 
-import com.accenture.pregunton.exception.*;
+import com.accenture.pregunton.exception.CategoryNotFoundException;
+import com.accenture.pregunton.exception.GameCodeNotFoundException;
+import com.accenture.pregunton.exception.GameIdNotFoundException;
+import com.accenture.pregunton.exception.GameOverException;
+import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
+import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.util.SimpleResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,4 +70,12 @@ public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
             .build());
   }
 
+  @ExceptionHandler(LastQuestionNotAnswerException.class)
+  protected ResponseEntity<Object> lastQuestionNotAnswerHandler(LastQuestionNotAnswerException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(SimpleResponse.builder()
+            .message(ex.getMessage())
+            .status(HttpStatus.BAD_REQUEST)
+            .build());
+  }
 }

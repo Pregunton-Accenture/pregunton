@@ -1,9 +1,9 @@
 package com.accenture.pregunton.controller;
 
+import com.accenture.pojo.GameDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;
-import com.accenture.pregunton.pojo.GameDto;
 import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +22,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -138,7 +143,6 @@ public class GameControllerTest {
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
         .characterEncoding("utf-8"))
         .andExpect(status().is2xxSuccessful());
-
   }
 
   @Test
@@ -164,7 +168,5 @@ public class GameControllerTest {
         .characterEncoding("utf-8")
         .param("all", "false"))
         .andExpect(status().isNotFound());
-
   }
-
 }

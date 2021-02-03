@@ -16,15 +16,29 @@
 CREATE DATABASE IF NOT EXISTS `accenture_pregunton` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `accenture_pregunton`;
 
+-- Volcando estructura para tabla accenture_pregunton.categories
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNQ_name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+-- La exportación de datos fue deseleccionada.
+
 -- Volcando estructura para tabla accenture_pregunton.games
 CREATE TABLE IF NOT EXISTS `games` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `master_id` bigint(20) NOT NULL DEFAULT 0,
   `code` varchar(6) NOT NULL,
-  `category` enum('Y','N') DEFAULT NULL,
+  `category_id` bigint(20) NOT NULL,
   `rules_id` bigint(20) NOT NULL,
   `hit` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_games_rules_1` FOREIGN KEY(`rules_id`) REFERENCES `rules`(`id`)
+  KEY `fk_games_rules_1` (`rules_id`),
+  KEY `FK_games_category` (`category_id`),
+  CONSTRAINT `FK_games_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+  CONSTRAINT `fk_games_rules_1` FOREIGN KEY (`rules_id`) REFERENCES `rules` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
@@ -99,20 +113,10 @@ CREATE TABLE IF NOT EXISTS `questions` (
 -- Volcando estructura para tabla accenture_pregunton.rules
 CREATE TABLE IF NOT EXISTS `rules` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `hit_limit` int DEFAULT 5,
-  `question_limit` int DEFAULT 10,
+  `hit_limit` int(11) DEFAULT 5,
+  `question_limit` int(11) DEFAULT 10,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Volcando estructura para tabla accenture_pregunton.rules
-CREATE TABLE IF NOT EXISTS `categories` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `UNQ_name` UNIQUE (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-insert into `categories` (name) values ('PERSONAJES'), ('PELICULAS'), ('SERIES'), ('LUGARES'), ('ANIMALES');
 
 -- La exportación de datos fue deseleccionada.
 

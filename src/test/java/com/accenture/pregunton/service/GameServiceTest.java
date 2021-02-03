@@ -1,18 +1,19 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.model.Game;
+import com.accenture.model.Player;
+import com.accenture.model.Question;
+import com.accenture.pojo.Answer;
+import com.accenture.pojo.GameDto;
+import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;
 import com.accenture.pregunton.mapper.MapperList;
-import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.model.Player;
-import com.accenture.pregunton.model.Question;
-import com.accenture.pregunton.pojo.Answer;
-import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.util.ModelUtil;
+import io.swagger.models.Model;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -126,6 +127,7 @@ public class GameServiceTest {
   @Test
   public void shouldAddAPlayerIfThereIsNone() {
     Game game = Game.builder()
+        .rules(ModelUtil.RULES)
         .build();
     Mockito.when(gameRepository.findById(ModelUtil.ID))
         .thenReturn(Optional.of(game));
@@ -163,7 +165,7 @@ public class GameServiceTest {
   public void obtainQuestions_WhenSendingValidGameCodeAndWithoutAllQuestion_ShouldReturnAListOfQuestions() {
     Question question1 = Question.builder()
         .question("question 2")
-        .answer(Answer.SI)
+        .answer(Answer.SIN_RESPUESTA)
         .build();
     Question question2 = Question.builder()
         .question("question 3")
@@ -171,7 +173,7 @@ public class GameServiceTest {
         .build();
     QuestionDto questionDto1 = new QuestionDto();
     questionDto1.setQuestion("question 2");
-    questionDto1.setAnswer(Answer.SI);
+    questionDto1.setAnswer(Answer.SIN_RESPUESTA);
     QuestionDto questionDto2 = new QuestionDto();
     questionDto2.setQuestion("question 3");
     questionDto2.setAnswer(Answer.NO);
@@ -187,11 +189,11 @@ public class GameServiceTest {
         .thenReturn(Optional.of(game));
     Mockito.when(mapperList.mapToDtoList(any(), any()))
         .thenCallRealMethod();
-    Mockito.when(modelMapper.map(eq(ModelUtil.QUESTION), eq(QuestionDto.class)))
-        .thenReturn(ModelUtil.QUESTION_DTO);
+    Mockito.when(modelMapper.map(eq(question1), eq(QuestionDto.class)))
+        .thenReturn(questionDto1);
 
     List<QuestionDto> result = gameService.obtainQuestions(ModelUtil.CODE, false);
-    List<QuestionDto> expected = Collections.singletonList(ModelUtil.QUESTION_DTO);
+    List<QuestionDto> expected = Collections.singletonList(questionDto1);
 
     assertEquals(expected, result);
   }

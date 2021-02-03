@@ -1,14 +1,18 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.model.Category;
+import com.accenture.model.Game;
+import com.accenture.model.Player;
+import com.accenture.model.Question;
+import com.accenture.model.Rules;
+import com.accenture.pojo.Answer;
+import com.accenture.pojo.GameDto;
+import com.accenture.pojo.QuestionDto;
+import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;
 import com.accenture.pregunton.mapper.MapperList;
-import com.accenture.pregunton.model.*;
-import com.accenture.pregunton.pojo.Answer;
-import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.QuestionDto;
-import com.accenture.pregunton.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.google.common.collect.Lists;
@@ -73,8 +77,10 @@ public class GameService {
         .orElseThrow(() -> new GameIdNotFoundException(gameId));
 
     Player player = mapper.map(playerDto, Player.class);
-    player.setHitsLimit(game.getRules().getHitLimit());
-    player.setQuestionsLimit(game.getRules().getQuestionLimit());
+    player.setHitsLimit(game.getRules()
+        .getHitLimit());
+    player.setQuestionsLimit(game.getRules()
+        .getQuestionLimit());
 
     if (Objects.isNull(game.getPlayers())) {
       game.setPlayers(Lists.newArrayList(player));

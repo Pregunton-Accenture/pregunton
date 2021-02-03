@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 @Component
 public class MapperList {
 
-    public <E, R> List<R> mapToDtoList(List<E> entities, Function<E, R> mapper) {
-        return Optional.ofNullable(entities)
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(mapper)
-                .collect(Collectors.toList());
-    }
+  public <E, R> List<R> mapToDtoList(List<E> entities, Function<E, R> mapper) {
+    return Optional.ofNullable(entities)
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(mapper)
+        .collect(Collectors.toList());
+  }
 
 }

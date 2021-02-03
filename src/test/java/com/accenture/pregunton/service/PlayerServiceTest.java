@@ -1,13 +1,16 @@
 package com.accenture.pregunton.service;
 
+import com.accenture.model.Game;
+import com.accenture.model.Player;
+import com.accenture.model.Question;
+import com.accenture.pojo.Answer;
+import com.accenture.pojo.HitDto;
+import com.accenture.pojo.PlayerDto;
+import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
+import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
-import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.model.Player;
-import com.accenture.pregunton.pojo.HitDto;
-import com.accenture.pregunton.pojo.PlayerDto;
-import com.accenture.pregunton.pojo.QuestionDto;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.HitRepository;
 import com.accenture.pregunton.repository.PlayerRepository;
@@ -22,9 +25,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlayerServiceTest {
@@ -64,9 +71,6 @@ public class PlayerServiceTest {
         .save(ModelUtil.PLAYER);
     Mockito.verify(gameRepository, Mockito.times(1))
         .save(ModelUtil.GAME);
-
-    Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION))
-        .thenReturn(ModelUtil.QUESTION_DTO);
   }
 
   @Test
@@ -83,9 +87,6 @@ public class PlayerServiceTest {
         .save(ModelUtil.PLAYER);
     Mockito.verify(gameRepository, Mockito.times(1))
         .save(game);
-
-    Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION))
-        .thenReturn(ModelUtil.QUESTION_DTO);
   }
 
   @Test(expected = PlayerNotFoundException.class)
@@ -100,6 +101,35 @@ public class PlayerServiceTest {
     Mockito.when(gameRepository.findByCode(any()))
         .thenThrow(new GameCodeNotFoundException(ModelUtil.CODE));
     playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+  }
+
+  @Test(expected = LastQuestionNotAnswerException.class)
+  public void askQuestion_WhenSendingAQuestionAndTheLastOneHasBeenNotAnswerYet_ShouldThrowLastQuestionNotAnswerException() {
+    Player player = ModelUtil.createPlayer();
+    player.setQuestions(Stream.of(Question.builder()
+        .answer(Answer.SIN_RESPUESTA)
+        .build())
+        .collect(Collectors.toList()));
+
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(player));
+
+    Game game = ModelUtil.createGame();
+    game.setPlayers(Stream.of(player)
+        .collect(Collectors.toList()));
+
+    Mockito.when(gameRepository.findByCode(anyString()))
+        .thenReturn(Optional.of(game));
+
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+
+    Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION))
+        .thenReturn(ModelUtil.QUESTION_DTO);
+
+    Mockito.verify(playerRepository, Mockito.times(1))
+        .save(ModelUtil.PLAYER);
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .save(ModelUtil.GAME);
   }
 
   @Test
@@ -122,11 +152,20 @@ public class PlayerServiceTest {
 
   @Test
   public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrect_ShouldReturnTrue() {
-    Mockito.when(gameRepository.findByCode(anyString()))
-        .thenReturn(Optional.of(ModelUtil.GAME));
-    playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
-    Mockito.when(playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS))
+    Mockito.when(playerRepository.findById(ModelUtil.ID))
+        .thenReturn(Optional.of(ModelUtil.PLAYER));
+    Mockito.when(gameRepository.getHitByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(ModelUtil.CORRECT_GUESS));
+    Mockito.when(hitRepository.save(any()))
+        .thenReturn(ModelUtil.HIT);
+    Mockito.when(playerRepository.save(any()))
+        .thenReturn(ModelUtil.PLAYER);
+    Mockito.when(modelMapper.map(any(), any()))
         .thenReturn(ModelUtil.HIT_DTO);
+
+    HitDto result = playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+
+    assertEquals(ModelUtil.HIT_DTO, result);
   }
 
   @Test(expected = GameOverException.class)

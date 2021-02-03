@@ -1,9 +1,9 @@
 package com.accenture.pregunton.controller;
 
-import com.accenture.pregunton.model.Game;
-import com.accenture.pregunton.pojo.GameDto;
-import com.accenture.pregunton.pojo.QuestionDto;
-import com.accenture.pregunton.pojo.request.PlayerRequestDto;
+import com.accenture.model.Game;
+import com.accenture.pojo.GameDto;
+import com.accenture.pojo.QuestionDto;
+import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.service.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,7 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.NotNull;
@@ -93,7 +103,7 @@ public class GameController {
   }
 
   @GetMapping(value = "/v1.0/{code}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation("get the questions of a specific game")
+  @ApiOperation("get the questions of a specific game or get only the questions that are not anwered yet.")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "OK"),
       @ApiResponse(code = 204, message = "No content"),
@@ -105,7 +115,8 @@ public class GameController {
   public ResponseEntity<List<QuestionDto>> getGameQuestions(@PathVariable String code,
                                                             @RequestParam(name = "all") Boolean withAllQuestion) {
     List<QuestionDto> questions = gameService.obtainQuestions(code, withAllQuestion);
-    return ResponseEntity.ok(questions);
+    return questions.isEmpty() ? ResponseEntity.noContent()
+        .build() : ResponseEntity.ok(questions);
   }
 
 }
