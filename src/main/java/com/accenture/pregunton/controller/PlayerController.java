@@ -24,7 +24,7 @@ public class PlayerController {
     @Autowired
     private PlayerService playerService;
 
-    @PatchMapping("/v1.0/ask")
+    @PatchMapping("/v1.0/{playerId}/questions")
     @ApiOperation("Ask a question.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -32,12 +32,12 @@ public class PlayerController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<QuestionDto> makeAQuestion(@RequestHeader Long playerId, @RequestHeader String code, String question) {
+    public ResponseEntity<QuestionDto> makeAQuestion(@PathVariable Long playerId, @RequestHeader String code, String question) {
         QuestionDto questionDto = playerService.askQuestion(playerId, code, question);
         return ResponseEntity.ok(questionDto);
     }
 
-    @PostMapping("/v1.0/guess")
+    @PostMapping("/v1.0/{playerId}/guess")
     @ApiOperation("Make a guess.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -45,7 +45,7 @@ public class PlayerController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error"),
     })
-    public ResponseEntity<HitDto> makeAGuess(@RequestHeader Long playerId, @RequestHeader String code, String guess) {
+    public ResponseEntity<HitDto> makeAGuess(@PathVariable Long playerId, @RequestHeader String code, String guess) {
         HitDto playerGuess = playerService.makeAGuess(playerId, code, guess);
         return ResponseEntity.ok(playerGuess);
     }

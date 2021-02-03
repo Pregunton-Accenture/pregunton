@@ -134,7 +134,7 @@ public class GameControllerTest {
     Mockito.verify(gameService, Mockito.times(1))
         .addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
 
-    mvc.perform(patch("/games/v1.0/{gameId}", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(patch("/games/v1.0/{gameId}/players", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
         .characterEncoding("utf-8"))
         .andExpect(status().is2xxSuccessful());
@@ -147,7 +147,7 @@ public class GameControllerTest {
         .thenReturn(Stream.of(ModelUtil.QUESTION_DTO)
             .collect(Collectors.toList()));
 
-    mvc.perform(get("/games/v1.0/code/{code}", ModelUtil.CODE).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/games/v1.0/{code}/questions", ModelUtil.CODE).contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
         .param("all", "true"))
         .andExpect(status().isOk());
@@ -160,7 +160,7 @@ public class GameControllerTest {
     Mockito.when(gameService.obtainQuestions(eq(wrongCode), eq(false)))
         .thenThrow(new GameCodeNotFoundException(wrongCode));
 
-    mvc.perform(get("/games/v1.0/code/{code}", wrongCode).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/games/v1.0/{code}/questions", wrongCode).contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
         .param("all", "false"))
         .andExpect(status().isNotFound());

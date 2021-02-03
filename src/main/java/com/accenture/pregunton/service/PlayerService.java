@@ -27,8 +27,6 @@ import java.util.Optional;
 @Service
 public class PlayerService {
 
-  private static final String GAME_NOT_FOUND = "Game not found with code: ";
-  private static final String PLAYER_NOT_FOUND = "Player not found with id: ";
   @Autowired
   private PlayerRepository playerRepository;
   @Autowired
@@ -40,7 +38,7 @@ public class PlayerService {
 
   public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
     Player player = playerRepository.findById(playerId)
-        .orElseThrow(() -> new PlayerNotFoundException(PLAYER_NOT_FOUND + playerId));
+        .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
     Question question = Question.builder()
         .question(playerQuestion)
@@ -57,10 +55,7 @@ public class PlayerService {
 
   public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
     Player player = playerRepository.findById(playerId)
-        .orElseThrow(() -> new PlayerNotFoundException(PLAYER_NOT_FOUND + playerId));
-    Game game = gameRepository.findByCode(gameCode)
-        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
-
+        .orElseThrow(() -> new PlayerNotFoundException(playerId));
     checkIfPlayerAlreadyLose(player);
 
     Hit hit = Hit.builder()
@@ -69,18 +64,20 @@ public class PlayerService {
         .player(player)
         .build();
 
-    hit.setIsCorrect(game.getHit()
-        .toLowerCase(Locale.ROOT)
+    String gameHit = gameRepository.getHitByCode(gameCode)
+        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
+    hit.setIsCorrect(gameHit.toLowerCase(Locale.ROOT)
         .equals(guess.toLowerCase(Locale.ROOT)));
 
     hitRepository.save(hit);
+    playerRepository.save(player);
 
     return mapper.map(hit, HitDto.class);
   }
 
   public Optional<PlayerDto> getPlayer(Long playerId) {
     Player player = playerRepository.findById(playerId)
-        .orElseThrow(() -> new PlayerNotFoundException(PLAYER_NOT_FOUND + playerId));
+        .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
     return Optional.of(mapper.map(player, PlayerDto.class));
   }
@@ -90,7 +87,7 @@ public class PlayerService {
     if (player.getHitsLimit() != NO_MORE_CHANCES) {
       player.setHitsLimit(player.getHitsLimit() - 1);
     } else {
-      throw new GameOverException("This player already lose.");
+      throw new GameOverException(player.getNickName());
     }
   }
 
@@ -106,7 +103,6 @@ public class PlayerService {
     }
 
     gameRepository.save(game);
-
   }
 
 }

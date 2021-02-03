@@ -73,6 +73,8 @@ public class GameService {
         .orElseThrow(() -> new GameIdNotFoundException(gameId));
 
     Player player = mapper.map(playerDto, Player.class);
+    player.setHitsLimit(game.getRules().getHitLimit());
+    player.setQuestionsLimit(game.getRules().getQuestionLimit());
 
     if (Objects.isNull(game.getPlayers())) {
       game.setPlayers(Lists.newArrayList(player));

@@ -27,6 +27,9 @@ public class Player implements Serializable {
     @Column(name = "hits_limit")
     private int hitsLimit;
 
+    @Column(name = "questions_limit")
+    private int questionsLimit;
+
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Question> questions;
 

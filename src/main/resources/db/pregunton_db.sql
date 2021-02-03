@@ -74,7 +74,8 @@ CREATE TABLE IF NOT EXISTS `hits` (
 -- Volcando estructura para tabla accenture_pregunton.players
 CREATE TABLE IF NOT EXISTS `players` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `hits_limit` int(11) DEFAULT NULL,
+  `hits_limit` int(11) DEFAULT 0,
+  `questions_limit` int(11) DEFAULT 0,
   `nick_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -100,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `rules` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `hit_limit` int DEFAULT 5,
   `question_limit` int DEFAULT 10,
-  PRIMARY KEY (`ìd`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Volcando estructura para tabla accenture_pregunton.rules

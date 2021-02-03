@@ -68,7 +68,7 @@ public class PlayerControllerTest {
     @Test
     public void obtainPlayer_WhenInvalidInput_ShouldReturn404Exception() throws Exception {
 
-        Mockito.doThrow(new PlayerNotFoundException("Player not found with id: " + ModelUtil.ID))
+        Mockito.doThrow(new PlayerNotFoundException(ModelUtil.ID))
                 .when(playerService).getPlayer(any());
 
         mvc.perform(
@@ -119,7 +119,7 @@ public class PlayerControllerTest {
     public void obtainPlayer_WhenSendinInvalidPlayerId_ShouldThrowPlayerNotFoundException() throws Exception {
 
         Mockito.when(playerService.getPlayer(any()))
-                .thenThrow(new PlayerNotFoundException("Player not found."));
+                .thenThrow(new PlayerNotFoundException(ModelUtil.ID));
 
         mvc.perform(
                 get("/players/v1.0/{playerId}", ModelUtil.ID)
