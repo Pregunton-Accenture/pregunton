@@ -13,7 +13,6 @@ import com.accenture.pregunton.mapper.MapperList;
 import com.accenture.pregunton.repository.CategoryRepository;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.util.ModelUtil;
-import io.swagger.models.Model;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +29,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -101,11 +102,12 @@ public class GameServiceTest {
     assertEquals(ModelUtil.GAME_DTO, result.get());
   }
 
-  @Test(expected = GameIdNotFoundException.class)
-  public void shouldThrowAnExceptionWhenGameNotFound() {
+  @Test
+  public void getOne_WhenIdDoesNotExist_ShouldReturnEmptyOptional() {
     Mockito.when(gameRepository.findById(ModelUtil.ID))
         .thenReturn(Optional.empty());
-    gameService.getOne(ModelUtil.ID);
+    assertFalse(gameService.getOne(ModelUtil.ID)
+        .isPresent());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -203,6 +205,47 @@ public class GameServiceTest {
     Mockito.when(gameRepository.findById(ModelUtil.ID))
         .thenReturn(Optional.empty());
     gameService.obtainQuestions(ModelUtil.CODE, true);
+  }
+
+  @Test
+  public void saveQuestion_WhenGameCodeAndQuestionAreValidAndQuestionsListEmpty_ShouldNotThrowException() {
+    Game game = ModelUtil.createGame();
+    game.setQuestions(null);
+
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(game));
+    Mockito.when(gameRepository.save(any()))
+        .thenReturn(game);
+
+    gameService.saveQuestion(ModelUtil.CODE, ModelUtil.QUESTION);
+
+    Mockito.verify(gameRepository, Mockito.times(1)).findByCode(any());
+    Mockito.verify(gameRepository, Mockito.times(1)).save(any());
+  }
+
+  @Test
+  public void saveQuestion_WhenGameCodeAndQuestionAreValidAndQuestionsListNotEmpty_ShouldNotThrowException() {
+    Game game = ModelUtil.createGame();
+    game.getQuestions()
+        .add(ModelUtil.QUESTION);
+
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(game));
+    Mockito.when(gameRepository.save(any()))
+        .thenReturn(game);
+
+    gameService.saveQuestion(ModelUtil.CODE, ModelUtil.QUESTION);
+
+    Mockito.verify(gameRepository, Mockito.times(1)).findByCode(any());
+    Mockito.verify(gameRepository, Mockito.times(1)).save(any());
+  }
+
+  @Test(expected = GameCodeNotFoundException.class)
+  public void saveQuestion_WhenGameCodeDoesNotExist_ShouldThrowGameCodeNotFoundException() {
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.empty());
+
+    gameService.saveQuestion(ModelUtil.CODE, ModelUtil.QUESTION);
   }
 
 }

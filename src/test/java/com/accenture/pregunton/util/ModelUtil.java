@@ -67,6 +67,7 @@ public class ModelUtil {
         .id(ID)
         .hitsLimit(HITS_LIMIT)
         .nickName(NICK_NAME)
+        .questionsLimit(DUMMY_QUESTION_LIMIT)
         .questions(Stream.of(QUESTION)
             .collect(Collectors.toList()))
         .build();

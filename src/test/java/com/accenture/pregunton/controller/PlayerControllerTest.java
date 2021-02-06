@@ -81,6 +81,20 @@ public class PlayerControllerTest {
   }
 
   @Test
+  public void obtainPlayer_whenValidInputButEmptyOptional_ShouldReturn204() throws Exception {
+
+    Mockito.when(playerService.getPlayer(anyLong()))
+        .thenReturn(Optional.empty());
+
+    mvc.perform(get("/players/v1.0/{playerId}", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
+        .param("playerId", String.valueOf(ModelUtil.ID))
+        .characterEncoding("utf-8"))
+        .andExpect(status().isNoContent());
+
+  }
+
+  @Test
   public void obtainPlayer_WhenInvalidInput_ShouldReturn404Exception() throws Exception {
 
     Mockito.doThrow(new PlayerNotFoundException(ModelUtil.ID))
