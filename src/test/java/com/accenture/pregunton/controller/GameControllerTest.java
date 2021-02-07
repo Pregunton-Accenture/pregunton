@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -122,6 +123,19 @@ public class GameControllerTest {
   }
 
   @Test
+  public void obtainGame_WhenGetAGameThatDoesNotExists_ThenReturns204() throws Exception {
+    Mockito.when(gameService.getOne(ModelUtil.ID))
+        .thenReturn(Optional.empty());
+
+    mvc.perform(get("/games/v1.0/{gameId}", ModelUtil.ID).accept(MediaType.APPLICATION_JSON_VALUE)
+        .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .param("gameId", String.valueOf(ModelUtil.ID))
+        .characterEncoding("utf-8"))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
   public void obtainGame_WhenTryingToGetAGameThatNoneExists_ThenReturns400() throws Exception {
 
     Mockito.when(gameService.getOne(ModelUtil.ID))
@@ -155,6 +169,18 @@ public class GameControllerTest {
         .characterEncoding("utf-8")
         .param("all", "true"))
         .andExpect(status().isOk());
+
+  }
+
+  @Test
+  public void getGameQuestions_WhenSendingValidCodeOfAGameButListIsEmpty_ShouldReturn204() throws Exception {
+    Mockito.when(gameService.obtainQuestions(eq(ModelUtil.CODE), eq(true)))
+        .thenReturn(new ArrayList<>());
+
+    mvc.perform(get("/games/v1.0/{code}/questions", ModelUtil.CODE).contentType(MediaType.APPLICATION_JSON)
+        .characterEncoding("utf-8")
+        .param("all", "true"))
+        .andExpect(status().isNoContent());
 
   }
 

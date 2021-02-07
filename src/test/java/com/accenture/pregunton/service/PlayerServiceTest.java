@@ -10,6 +10,7 @@ import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
+import com.accenture.pregunton.exception.PlayerMaxQuestionException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.HitRepository;
@@ -24,6 +25,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
+import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlayerServiceTest {
@@ -46,6 +50,8 @@ public class PlayerServiceTest {
   private HitRepository hitRepository;
   @Mock
   private GameRepository gameRepository;
+  @Mock
+  private GameService gameService;
 
   @Before
   public void setup() {
@@ -62,74 +68,96 @@ public class PlayerServiceTest {
 
   @Test
   public void askQuestion_ShouldAddAQuestionToTheGameAndThePlayer() {
-    Mockito.when(gameRepository.findByCode(anyString()))
-        .thenReturn(Optional.of(ModelUtil.GAME));
-
-    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
-
-    Mockito.verify(playerRepository, Mockito.times(1))
-        .save(ModelUtil.PLAYER);
-    Mockito.verify(gameRepository, Mockito.times(1))
-        .save(ModelUtil.GAME);
-  }
-
-  @Test
-  public void askQuestion_IfTheGameHasNotQuestionYet_ShouldAddNewQuestion() {
-    Game game = Game.builder()
-        .build();
+    Game game = ModelUtil.createGame();
+    game.setQuestions(null);
 
     Mockito.when(gameRepository.findByCode(anyString()))
         .thenReturn(Optional.of(game));
+    doNothing().when(gameService)
+        .saveQuestion(anyString(), any());
 
     playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
 
     Mockito.verify(playerRepository, Mockito.times(1))
         .save(ModelUtil.PLAYER);
-    Mockito.verify(gameRepository, Mockito.times(1))
-        .save(game);
   }
 
   @Test(expected = PlayerNotFoundException.class)
   public void askQuestion_WhenSendingInvalidId_ShouldThrowPlayerNotFoundException() {
     Mockito.when(playerRepository.findById(any()))
-        .thenThrow(new PlayerNotFoundException(ModelUtil.ID));
+        .thenReturn(Optional.empty());
     playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
   }
 
   @Test(expected = GameCodeNotFoundException.class)
-  public void askQuestion_WhenSavingTheQuestionsOfTheGameAndTheGameDontExist_ShouldThrowGameNotFoundException() {
+  public void askQuestion_WhenSavingTheQuestionsOfTheGameAndTheGameDoesNotExist_ShouldThrowGameNotFoundException() {
     Mockito.when(gameRepository.findByCode(any()))
-        .thenThrow(new GameCodeNotFoundException(ModelUtil.CODE));
+        .thenReturn(Optional.empty());
     playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
   }
 
   @Test(expected = LastQuestionNotAnswerException.class)
   public void askQuestion_WhenSendingAQuestionAndTheLastOneHasBeenNotAnswerYet_ShouldThrowLastQuestionNotAnswerException() {
     Player player = ModelUtil.createPlayer();
-    player.setQuestions(Stream.of(Question.builder()
+    Game game = ModelUtil.createGame();
+    game.setQuestions(Stream.of(Question.builder()
         .answer(Answer.SIN_RESPUESTA)
+        .player(player)
         .build())
         .collect(Collectors.toList()));
 
     Mockito.when(playerRepository.findById(anyLong()))
         .thenReturn(Optional.of(player));
+    Mockito.when(gameRepository.findByCode(anyString()))
+        .thenReturn(Optional.of(game));
 
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+  }
+
+  @Test
+  public void askQuestion_WhenSendingAQuestionAndListIsEmpty_ShouldSaveTheQuestion() {
     Game game = ModelUtil.createGame();
-    game.setPlayers(Stream.of(player)
-        .collect(Collectors.toList()));
+    game.setQuestions(new ArrayList<>());
 
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(ModelUtil.PLAYER));
     Mockito.when(gameRepository.findByCode(anyString()))
         .thenReturn(Optional.of(game));
 
     playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
 
-    Mockito.when(playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION))
-        .thenReturn(ModelUtil.QUESTION_DTO);
-
     Mockito.verify(playerRepository, Mockito.times(1))
-        .save(ModelUtil.PLAYER);
-    Mockito.verify(gameRepository, Mockito.times(1))
-        .save(ModelUtil.GAME);
+        .save(any());
+  }
+
+  @Test(expected = PlayerMaxQuestionException.class)
+  public void askQuestion_WhenSavingTheQuestionsOfTheGameAndPlayerExceedQuestionLimit_ShouldThrowPlayerMaxQuestionException() {
+    Player player = ModelUtil.createPlayer();
+    player.setQuestionsLimit(0);
+
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(player));
+
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+  }
+
+  @Test(expected = GameOverException.class)
+  public void askQuestion_WhenSavingTheQuestionsOfTheGameAndPlayerExceedHitLimit_ShouldThrowGameOverException() {
+    Player player = ModelUtil.createPlayer();
+    player.setHitsLimit(0);
+
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.of(player));
+
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
+  }
+
+  @Test(expected = PlayerNotFoundException.class)
+  public void askQuestion_WhenSavingTheQuestionsOfTheGameAndPlayerDoNotExists_ShouldThrowPlayerNotFoundException() {
+    Mockito.when(playerRepository.findById(anyLong()))
+        .thenReturn(Optional.empty());
+
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
   }
 
   @Test
@@ -143,11 +171,11 @@ public class PlayerServiceTest {
 
   @Test(expected = PlayerNotFoundException.class)
   public void getPlayer_WhenSendingInvalidID_ShouldReturnExpcetion() {
-    playerService.getPlayer(any());
-
     Mockito.doThrow(new PlayerNotFoundException(ModelUtil.ID))
         .when(playerRepository)
         .findById(anyLong());
+
+    playerService.getPlayer(ModelUtil.ID);
   }
 
   @Test
@@ -169,7 +197,7 @@ public class PlayerServiceTest {
   }
 
   @Test(expected = GameOverException.class)
-  public void makeAGuess_IfThePlayerMakeAGuessAndDontHaveMoreChances_ShouldReturnGameOverException() {
+  public void makeAGuess_IfThePlayerMakeAGuessAndDoesNotHaveMoreChances_ShouldReturnGameOverException() {
     Mockito.when(gameRepository.findByCode(anyString()))
         .thenReturn(Optional.of(ModelUtil.GAME));
 
@@ -189,14 +217,14 @@ public class PlayerServiceTest {
   @Test(expected = PlayerNotFoundException.class)
   public void makeAGuess_IfThePlayerMakeAGuessAndDoNotExist_ShouldThrowPlayerNotFoundException() {
     Mockito.when(playerRepository.findById(any()))
-        .thenThrow(new PlayerNotFoundException(ModelUtil.ID));
+        .thenReturn(Optional.empty());
     playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
   }
 
   @Test(expected = GameCodeNotFoundException.class)
-  public void makeAGuess_IfThePlayerMakeAGuessAndTheGameDontExist_ShouldThrowGameNotFoundException() {
+  public void makeAGuess_IfThePlayerMakeAGuessAndTheGameDoNotExist_ShouldThrowGameNotFoundException() {
     Mockito.when(gameRepository.findByCode(any()))
-        .thenThrow(new GameCodeNotFoundException(ModelUtil.CODE));
+        .thenReturn(Optional.empty());
     playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
   }
 

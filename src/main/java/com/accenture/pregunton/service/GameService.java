@@ -67,9 +67,8 @@ public class GameService {
   }
 
   public Optional<GameDto> getOne(Long id) {
-    Game game = gameRepository.findById(id)
-        .orElseThrow(() -> new GameIdNotFoundException(id));
-    return Optional.of(mapper.map(game, GameDto.class));
+    return gameRepository.findById(id)
+        .map(game -> mapper.map(game, GameDto.class));
   }
 
   public void addOnePlayer(Long gameId, PlayerRequestDto playerDto) {
@@ -87,6 +86,19 @@ public class GameService {
     } else {
       game.getPlayers()
           .add(player);
+    }
+    gameRepository.save(game);
+  }
+
+  public void saveQuestion(String gameCode, Question question) {
+    Game game = gameRepository.findByCode(gameCode)
+        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
+
+    if (Objects.isNull(game.getQuestions())) {
+      game.setQuestions(Lists.newArrayList(question));
+    } else {
+      game.getQuestions()
+          .add(question);
     }
     gameRepository.save(game);
   }

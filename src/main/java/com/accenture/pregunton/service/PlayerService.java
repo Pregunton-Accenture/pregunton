@@ -11,12 +11,12 @@ import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
+import com.accenture.pregunton.exception.PlayerMaxQuestionException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.repository.GameRepository;
 import com.accenture.pregunton.repository.HitRepository;
 import com.accenture.pregunton.repository.PlayerRepository;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,15 +37,37 @@ public class PlayerService {
   @Autowired
   private GameRepository gameRepository;
   @Autowired
+  private GameService gameService;
+  @Autowired
   private HitRepository hitRepository;
   @Autowired
   private ModelMapper mapper;
 
+  /**
+   * Adds the questions done by player in database.
+   *
+   * @param playerId the player that made the question
+   * @param gameCode the game where the player ask
+   * @param playerQuestion the question
+   *
+   * @return the question model saved in database
+   *
+   * @throws PlayerNotFoundException if the playerId does not exist
+   * @throws PlayerMaxQuestionException if the player exceed the max number of questions
+   * @throws GameOverException if the player already lose
+   * @throws GameCodeNotFoundException if the gameCode does not exist
+   * @throws LastQuestionNotAnswerException if the last question made by the player was not answered
+   */
   public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
+    checkIfPlayerCanAsk(player);
+    checkIfPlayerCanGuess(player);
     Game game = gameRepository.findByCode(gameCode)
         .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
+    if (checkIfPlayerQuestionHasBeenResponded(player, game)) {
+      throw new LastQuestionNotAnswerException(player.getNickName());
+    }
 
     Question question = Question.builder()
         .question(playerQuestion)
@@ -54,69 +76,103 @@ public class PlayerService {
         .player(player)
         .build();
 
-    if (checkIfPlayerQuestionHasBeenResponded(player, game)) {
-      throw new LastQuestionNotAnswerException(player.getNickName());
-    }
-
+    gameService.saveQuestion(gameCode, question);
+    player.setQuestionsLimit(player.getQuestionsLimit() - 1);
     playerRepository.save(player);
-    saveGameQuestion(game, question);
 
     return mapper.map(question, QuestionDto.class);
   }
 
+  /**
+   * Validates and saves a Guess made by player.
+   * <p>
+   * Saves the guess and put "correct" value with <b>true</b> is the string is equals to the {@link Game} hit.
+   * </p>
+   *
+   * @param playerId the player that made the question
+   * @param gameCode the game where the player ask
+   * @param guess the hit made by player
+   *
+   * @return the hit model saved in database
+   *
+   * @throws PlayerNotFoundException if the playerId does not exist
+   * @throws GameOverException if the player exceed the hit limit
+   * @throws GameCodeNotFoundException if the gameCode does not exist
+   */
   public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
-    checkIfPlayerAlreadyLose(player);
+    checkIfPlayerCanGuess(player);
+    String gameHit = gameRepository.getHitByCode(gameCode)
+        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
 
     Hit hit = Hit.builder()
         .guess(guess)
         .published(LocalDateTime.now())
         .player(player)
+        .isCorrect(gameHit.toLowerCase(Locale.ROOT)
+            .equals(guess.toLowerCase(Locale.ROOT)))
         .build();
 
-    String gameHit = gameRepository.getHitByCode(gameCode)
-        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
-    hit.setIsCorrect(gameHit.toLowerCase(Locale.ROOT)
-        .equals(guess.toLowerCase(Locale.ROOT)));
-
     hitRepository.save(hit);
+    player.setHitsLimit(player.getHitsLimit() - 1);
     playerRepository.save(player);
 
     return mapper.map(hit, HitDto.class);
   }
 
+  /**
+   * Retrieves the player by the playerId.
+   *
+   * @param playerId the player identifier to search
+   *
+   * @return an Optional with the player data or an empty Optional if the playerId does not exist.
+   */
   public Optional<PlayerDto> getPlayer(Long playerId) {
-    Player player = playerRepository.findById(playerId)
-        .orElseThrow(() -> new PlayerNotFoundException(playerId));
-
-    return Optional.of(mapper.map(player, PlayerDto.class));
+    return playerRepository.findById(playerId)
+        .map((player) -> mapper.map(player, PlayerDto.class));
   }
 
-  private void checkIfPlayerAlreadyLose(Player player) {
+  /**
+   * Validates if the player does not exceed the limit of hits.
+   *
+   * @param player the player data.
+   *
+   * @throws GameOverException if the player exceed the hit limit.
+   */
+  private void checkIfPlayerCanGuess(Player player) {
     int NO_MORE_CHANCES = 0;
-    if (player.getHitsLimit() != NO_MORE_CHANCES) {
-      player.setHitsLimit(player.getHitsLimit() - 1);
-    } else {
+    if (player.getHitsLimit() <= NO_MORE_CHANCES) {
       throw new GameOverException(player.getNickName());
     }
   }
 
-  private void saveGameQuestion(Game game, Question question) {
-    if (Objects.isNull(game.getQuestions())) {
-      game.setQuestions(Lists.newArrayList(question));
-    } else {
-      game.getQuestions()
-          .add(question);
-    }
 
-    gameRepository.save(game);
+  /**
+   * Validates if the player does not exceed the limit of questions.
+   *
+   * @param player the player data.
+   *
+   * @throws PlayerMaxQuestionException if the player exceed the questions limit.
+   */
+  private void checkIfPlayerCanAsk(Player player) {
+    int NO_MORE_CHANCES = 0;
+    if (player.getQuestionsLimit() <= NO_MORE_CHANCES) {
+      throw new PlayerMaxQuestionException(player.getNickName());
+    }
   }
 
+  /**
+   * Validates if the last question of a player has been responded.
+   *
+   * @param player the player data
+   * @param game the game data
+   *
+   * @return <b>true</b> if the last question was responded; otherwise <b>false</b>
+   */
   private boolean checkIfPlayerQuestionHasBeenResponded(Player player, Game game) {
-    if (Objects.isNull(game.getQuestions())) {
-      return false;
-    } else {
+    boolean result = false;
+    if (Objects.nonNull(game.getQuestions())) {
       List<Question> sortedQuestions = game.getQuestions()
           .stream()
           .filter(question -> question.getPlayer()
@@ -124,13 +180,12 @@ public class PlayerService {
               .equals(player.getId()))
           .sorted(Comparator.comparing(Question::getPublished))
           .collect(Collectors.toList());
-      if (sortedQuestions.isEmpty()) {
-        return false;
-      } else {
+      if (!sortedQuestions.isEmpty()) {
         Question lastQuestion = Iterables.getLast(sortedQuestions);
-        return lastQuestion.getAnswer()
+        result = lastQuestion.getAnswer()
             .equals(Answer.SIN_RESPUESTA);
       }
     }
+    return result;
   }
 }
