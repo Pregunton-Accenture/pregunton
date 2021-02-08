@@ -11,7 +11,6 @@ import com.accenture.pojo.GameDto;
 import com.accenture.pojo.HitDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
-import com.accenture.pojo.request.PlayerRequestDto;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
@@ -23,6 +22,7 @@ public class ModelUtil {
   //Dummy Data
   public static final Long ID = 1L;
   public static final int HITS_LIMIT = 5;
+  public static final String MASTER_NAME = "MASTER";
   public static final String DUMMY_CATEGORY = "SOME CATEGORY";
   public static final String DUMMY_QUESTION = "SOME QUESTION";
   public static final String CORRECT_GUESS = "John Doe";
@@ -42,7 +42,6 @@ public class ModelUtil {
   public static ModelMapper MODEL_MAPPER = new ModelMapper();
   //Dtos
   public static final PlayerDto PLAYER_DTO = MODEL_MAPPER.map(PLAYER, PlayerDto.class);
-  public static final PlayerRequestDto PLAYER_REQUEST_DTO = MODEL_MAPPER.map(PLAYER, PlayerRequestDto.class);
   public static final QuestionDto QUESTION_DTO = MODEL_MAPPER.map(QUESTION, QuestionDto.class);
   public static final HitDto HIT_DTO = MODEL_MAPPER.map(HIT, HitDto.class);
   public static final GameDto GAME_DTO = MODEL_MAPPER.map(GAME, GameDto.class);
@@ -85,14 +84,6 @@ public class ModelUtil {
 
   public static Rules createRules() {
     return Rules.builder()
-        .hitLimit(DUMMY_HIT_LIMIT)
-        .questionLimit(DUMMY_QUESTION_LIMIT)
-        .build();
-  }
-
-  public static Rules createRulesWithID() {
-    return Rules.builder()
-        .id(1L)
         .hitLimit(DUMMY_HIT_LIMIT)
         .questionLimit(DUMMY_QUESTION_LIMIT)
         .build();

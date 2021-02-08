@@ -44,9 +44,9 @@ public class GameService {
   private MapperList mapperList;
 
   @Transactional
-  public Game create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException {
+  public Game create(GameDto gameDto, String master, Long categoryId) throws RuntimeException {
     Objects.requireNonNull(gameDto);
-    Objects.requireNonNull(masterId);
+    Objects.requireNonNull(master);
     Objects.requireNonNull(categoryId);
     Category category = categoryRepository.findById(categoryId)
         .orElseThrow((() -> new CategoryNotFoundException(categoryId)));
@@ -55,7 +55,7 @@ public class GameService {
     Rules savedRules = rulesService.save(game.getRules());
 
     game.setRules(savedRules);
-    game.setMasterId(masterId);
+    game.setMaster(master);
     game.setCategory(category);
     game.setStatus(GameStatus.IN_PROGRESS);
     game.setCode(RandomStringUtils.random(6, true, true)
