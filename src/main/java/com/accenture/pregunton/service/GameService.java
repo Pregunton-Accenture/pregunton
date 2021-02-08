@@ -10,7 +10,6 @@ import com.accenture.pojo.GameDto;
 import com.accenture.pojo.GameStatus;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
-import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;

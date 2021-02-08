@@ -4,7 +4,6 @@ import com.accenture.model.Game;
 import com.accenture.pojo.GameDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
-import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.service.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

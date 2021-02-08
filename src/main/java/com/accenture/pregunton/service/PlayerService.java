@@ -22,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -100,6 +101,7 @@ public class PlayerService {
    * @throws GameOverException if the player exceed the hit limit
    * @throws GameCodeNotFoundException if the gameCode does not exist
    */
+  @Transactional
   public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
@@ -118,7 +120,7 @@ public class PlayerService {
     if (hit.getIsCorrect()) {
       Game game = gameRepository.findByCode(gameCode)
           .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
-      game.setStatus(GameStatus.FINISH);
+      game.setStatus(GameStatus.FINISHED);
       gameRepository.save(game);
     }
 
