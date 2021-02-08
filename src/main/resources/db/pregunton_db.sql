@@ -29,17 +29,18 @@ CREATE TABLE IF NOT EXISTS `categories` (
 -- Volcando estructura para tabla accenture_pregunton.games
 CREATE TABLE IF NOT EXISTS `games` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `master_id` bigint(20) NOT NULL DEFAULT 0,
+  `master` varchar(50) NOT NULL DEFAULT '0',
   `code` varchar(6) NOT NULL,
   `category_id` bigint(20) NOT NULL,
   `rules_id` bigint(20) NOT NULL,
   `hit` varchar(255) DEFAULT NULL,
+  `status` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `fk_games_rules_1` (`rules_id`),
   KEY `FK_games_category` (`category_id`),
   CONSTRAINT `FK_games_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   CONSTRAINT `fk_games_rules_1` FOREIGN KEY (`rules_id`) REFERENCES `rules` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -53,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `games_players` (
   KEY `FK_players_games` (`id_player`),
   CONSTRAINT `FK_games_players` FOREIGN KEY (`id_game`) REFERENCES `games` (`id`),
   CONSTRAINT `FK_players_games` FOREIGN KEY (`id_player`) REFERENCES `players` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -81,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `hits` (
   PRIMARY KEY (`id`),
   KEY `FK_hits_players` (`id_player`),
   CONSTRAINT `FK_hits_players` FOREIGN KEY (`id_player`) REFERENCES `players` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -92,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `players` (
   `questions_limit` int(11) DEFAULT 0,
   `nick_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -116,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `rules` (
   `hit_limit` int(11) DEFAULT 5,
   `question_limit` int(11) DEFAULT 10,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 
 -- La exportación de datos fue deseleccionada.
 
