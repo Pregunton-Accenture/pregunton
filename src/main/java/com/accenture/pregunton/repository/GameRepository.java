@@ -14,4 +14,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
   @Query(value = "SELECT g.hit FROM Games g WHERE g.code = :code", nativeQuery = true)
   Optional<String> getHitByCode(String code);
+
+  @Query(value = "SELECT g.status FROM Games g WHERE g.code = :code", nativeQuery = true)
+  Optional<String> getStatusByCode(String code);
+
 }

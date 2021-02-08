@@ -5,6 +5,7 @@ import com.accenture.model.Hit;
 import com.accenture.model.Player;
 import com.accenture.model.Question;
 import com.accenture.pojo.Answer;
+import com.accenture.pojo.GameStatus;
 import com.accenture.pojo.HitDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
@@ -113,6 +114,13 @@ public class PlayerService {
         .isCorrect(gameHit.toLowerCase(Locale.ROOT)
             .equals(guess.toLowerCase(Locale.ROOT)))
         .build();
+
+    if (hit.getIsCorrect()) {
+      Game game = gameRepository.findByCode(gameCode)
+          .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
+      game.setStatus(GameStatus.FINISH);
+      gameRepository.save(game);
+    }
 
     hitRepository.save(hit);
     player.setHitsLimit(player.getHitsLimit() - 1);

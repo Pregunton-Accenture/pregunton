@@ -148,12 +148,12 @@ public class GameControllerTest {
 
   @Test
   public void addPlayer_WhenSendingValidDataOfAPlayer_ShouldReturn204() throws Exception {
-    gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    gameService.addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
 
     Mockito.verify(gameService, Mockito.times(1))
-        .addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+        .addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
 
-    mvc.perform(patch("/games/v1.0/{gameId}/players", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(patch("/games/v1.0/{gameCode}/players", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
         .characterEncoding("utf-8"))
         .andExpect(status().is2xxSuccessful());

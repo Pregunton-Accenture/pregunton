@@ -2,6 +2,7 @@ package com.accenture.pregunton.controller;
 
 import com.accenture.model.Game;
 import com.accenture.pojo.GameDto;
+import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
 import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.service.GameService;
@@ -88,7 +89,7 @@ public class GameController {
             .build()));
   }
 
-  @PatchMapping("/v1.0/{gameId}/players")
+  @PatchMapping("/v1.0/{gameCode}/players")
   @ApiOperation("Add player to existing game.")
   @ApiResponses(value = {
       @ApiResponse(code = 204, message = "No Content"),
@@ -96,8 +97,8 @@ public class GameController {
       @ApiResponse(code = 404, message = "Not Found"),
       @ApiResponse(code = 500, message = "Internal Server Error"),
   })
-  public ResponseEntity<Void> addPlayer(@NotNull @PathVariable Long gameId, @RequestBody PlayerRequestDto playerDto) {
-    gameService.addOnePlayer(gameId, playerDto);
+  public ResponseEntity<Void> addPlayer(@NotNull @PathVariable String gameCode, @RequestBody PlayerDto playerDto) {
+    gameService.addOnePlayer(gameCode, playerDto);
     return ResponseEntity.noContent()
         .build();
   }

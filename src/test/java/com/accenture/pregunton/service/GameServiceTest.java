@@ -123,7 +123,7 @@ public class GameServiceTest {
         .thenReturn(Optional.of(ModelUtil.GAME));
     Mockito.when(modelMapper.map(any(), eq(Player.class)))
         .thenReturn(ModelUtil.PLAYER);
-    gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    gameService.addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
   }
 
   @Test
@@ -135,21 +135,21 @@ public class GameServiceTest {
         .thenReturn(Optional.of(game));
     Mockito.when(modelMapper.map(any(), eq(Player.class)))
         .thenReturn(ModelUtil.PLAYER);
-    gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    gameService.addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
   }
 
   @Test(expected = GameIdNotFoundException.class)
   public void addOnePlayer_WhenGameIDDoesNotExists_ShouldThrowGameNotFoundException() {
     Mockito.when(gameRepository.findById(ModelUtil.ID))
         .thenReturn(Optional.empty());
-    gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    gameService.addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void addOnePlayer_WhenGameIDIsNull_ShouldThrowIllegalArgumentException() {
     Mockito.when(gameRepository.findById(null))
         .thenThrow(IllegalArgumentException.class);
-    gameService.addOnePlayer(null, ModelUtil.PLAYER_REQUEST_DTO);
+    gameService.addOnePlayer(null, ModelUtil.PLAYER_DTO);
   }
 
   @Test
