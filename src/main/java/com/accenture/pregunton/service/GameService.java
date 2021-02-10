@@ -7,8 +7,9 @@ import com.accenture.model.Question;
 import com.accenture.model.Rules;
 import com.accenture.pojo.Answer;
 import com.accenture.pojo.GameDto;
+import com.accenture.pojo.GameStatus;
+import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
-import com.accenture.pojo.request.PlayerRequestDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;
@@ -43,9 +44,9 @@ public class GameService {
   private MapperList mapperList;
 
   @Transactional
-  public Game create(GameDto gameDto, Long masterId, Long categoryId) throws RuntimeException {
+  public Game create(GameDto gameDto, String master, Long categoryId) throws RuntimeException {
     Objects.requireNonNull(gameDto);
-    Objects.requireNonNull(masterId);
+    Objects.requireNonNull(master);
     Objects.requireNonNull(categoryId);
     Category category = categoryRepository.findById(categoryId)
         .orElseThrow((() -> new CategoryNotFoundException(categoryId)));
@@ -54,7 +55,9 @@ public class GameService {
     Rules savedRules = rulesService.save(game.getRules());
 
     game.setRules(savedRules);
+    game.setMaster(master);
     game.setCategory(category);
+    game.setStatus(GameStatus.IN_PROGRESS);
     game.setCode(RandomStringUtils.random(6, true, true)
         .toUpperCase());
     return gameRepository.save(game);
@@ -71,9 +74,9 @@ public class GameService {
         .map(game -> mapper.map(game, GameDto.class));
   }
 
-  public void addOnePlayer(Long gameId, PlayerRequestDto playerDto) {
-    Game game = gameRepository.findById(gameId)
-        .orElseThrow(() -> new GameIdNotFoundException(gameId));
+  public void addOnePlayer(String gameCode, PlayerDto playerDto) {
+    Game game = gameRepository.findByCode(gameCode)
+        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
 
     Player player = mapper.map(playerDto, Player.class);
     player.setHitsLimit(game.getRules()

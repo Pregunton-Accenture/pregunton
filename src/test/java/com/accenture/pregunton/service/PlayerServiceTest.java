@@ -190,6 +190,8 @@ public class PlayerServiceTest {
         .thenReturn(ModelUtil.PLAYER);
     Mockito.when(modelMapper.map(any(), any()))
         .thenReturn(ModelUtil.HIT_DTO);
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(ModelUtil.GAME));
 
     HitDto result = playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
 

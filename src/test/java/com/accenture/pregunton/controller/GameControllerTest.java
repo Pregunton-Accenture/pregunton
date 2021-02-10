@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,12 +51,12 @@ public class GameControllerTest {
 
     Mockito.doReturn(ModelUtil.GAME)
         .when(gameService)
-        .create(any(), anyLong(), anyLong());
+        .create(any(), anyString(), anyLong());
 
     mvc.perform(post("/games/v1.0/").contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
         .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
-        .header("masterId", ModelUtil.ID)
+        .header("master", ModelUtil.MASTER_NAME)
         .header("categoryId", ModelUtil.ID))
         .andExpect(status().isCreated());
 
@@ -64,13 +65,13 @@ public class GameControllerTest {
   @Test
   public void createGame_WhenSendingInvalidCategoryId_ShouldThrowCategoryNotFoundException() throws Exception {
 
-    Mockito.when(gameService.create(any(), anyLong(), anyLong()))
+    Mockito.when(gameService.create(any(), anyString(), anyLong()))
         .thenThrow(new CategoryNotFoundException(ModelUtil.ID));
 
     mvc.perform(post("/games/v1.0/").contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
         .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
-        .header("masterId", ModelUtil.ID)
+        .header("master", ModelUtil.MASTER_NAME)
         .header("categoryId", ModelUtil.ID))
         .andExpect(status().is4xxClientError());
 
@@ -81,12 +82,12 @@ public class GameControllerTest {
 
     Mockito.doThrow(new RuntimeException("500"))
         .when(gameService)
-        .create(any(GameDto.class), anyLong(), anyLong());
+        .create(any(GameDto.class), anyString(), anyLong());
 
     mvc.perform(post("/games/v1.0/").accept(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.GAME_DTO))
         .contentType(MediaType.APPLICATION_JSON)
-        .header("masterId", String.valueOf(2L))
+        .header("master", ModelUtil.MASTER_NAME)
         .header("categoryId", String.valueOf(2L))
         .characterEncoding("utf-8"))
         .andExpect(status().is5xxServerError());
@@ -148,12 +149,12 @@ public class GameControllerTest {
 
   @Test
   public void addPlayer_WhenSendingValidDataOfAPlayer_ShouldReturn204() throws Exception {
-    gameService.addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+    gameService.addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
 
     Mockito.verify(gameService, Mockito.times(1))
-        .addOnePlayer(ModelUtil.ID, ModelUtil.PLAYER_REQUEST_DTO);
+        .addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO);
 
-    mvc.perform(patch("/games/v1.0/{gameId}/players", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(patch("/games/v1.0/{gameCode}/players", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
         .characterEncoding("utf-8"))
         .andExpect(status().is2xxSuccessful());

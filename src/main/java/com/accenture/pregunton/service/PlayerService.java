@@ -5,6 +5,7 @@ import com.accenture.model.Hit;
 import com.accenture.model.Player;
 import com.accenture.model.Question;
 import com.accenture.pojo.Answer;
+import com.accenture.pojo.GameStatus;
 import com.accenture.pojo.HitDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
@@ -21,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -99,6 +101,7 @@ public class PlayerService {
    * @throws GameOverException if the player exceed the hit limit
    * @throws GameCodeNotFoundException if the gameCode does not exist
    */
+  @Transactional
   public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
@@ -113,6 +116,13 @@ public class PlayerService {
         .isCorrect(gameHit.toLowerCase(Locale.ROOT)
             .equals(guess.toLowerCase(Locale.ROOT)))
         .build();
+
+    if (hit.getIsCorrect()) {
+      Game game = gameRepository.findByCode(gameCode)
+          .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
+      game.setStatus(GameStatus.FINISHED);
+      gameRepository.save(game);
+    }
 
     hitRepository.save(hit);
     player.setHitsLimit(player.getHitsLimit() - 1);
