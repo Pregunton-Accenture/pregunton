@@ -8,11 +8,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MapperConfigTest {
 
-  private MapperConfig mapperConfig;
+  private AppConfig mapperConfig;
 
   @Before
   public void setUp() {
-    mapperConfig = new MapperConfig();
+    mapperConfig = new AppConfig();
   }
 
   @Test

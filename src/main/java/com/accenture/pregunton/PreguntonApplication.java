@@ -9,7 +9,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @EnableSwagger2
 @PropertySource({
-                    "classpath:application.properties",
+                    "classpath:application.yml",
                     "classpath:database.properties"
                 })
 @EntityScan("com.accenture.model")

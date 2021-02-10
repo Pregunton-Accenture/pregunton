@@ -1,0 +1,7 @@
+server:
+  port: 8080
+
+authentication:
+  url: http://localhost:8081
+  subdomain:
+    validate: ${authentication.url}/validate

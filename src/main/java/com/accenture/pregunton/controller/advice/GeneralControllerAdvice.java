@@ -1,11 +1,13 @@
 package com.accenture.pregunton.controller.advice;
 
+import com.accenture.pojo.UnauthorizedResponseDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
+import com.accenture.pregunton.exception.UnauthorizedException;
 import com.accenture.pregunton.util.SimpleResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,5 +79,11 @@ public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
             .message(ex.getMessage())
             .status(HttpStatus.BAD_REQUEST)
             .build());
+  }
+
+  @ExceptionHandler(UnauthorizedException.class)
+  protected ResponseEntity<UnauthorizedResponseDto> unauthorizedExceptionHandler(UnauthorizedException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(new UnauthorizedResponseDto(ex.getPath()));
   }
 }
