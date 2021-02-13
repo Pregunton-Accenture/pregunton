@@ -1,7 +1,9 @@
 package com.accenture.pregunton.controller;
 
 import com.accenture.model.Category;
+import com.accenture.pregunton.exception.CategoryExistsException;
 import com.accenture.pregunton.service.CategoryService;
+import com.accenture.pregunton.util.ModelUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +12,8 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,14 +22,15 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,6 +60,32 @@ public class CategoryControllerTest {
   @Before
   public void setUp() {
     CATEGORY_LIST = new ArrayList<>();
+  }
+
+  @Test
+  public void update_WhenSendValidQuestionDto_ShouldReturnOk() throws Exception {
+    doReturn(ResponseEntity.ok(false)).when(restTemplate)
+        .exchange(any(), eq(HttpMethod.POST), any(), eq(Boolean.class));
+    doReturn(ModelUtil.CATEGORY).when(categoryService)
+        .insert(any());
+
+    this.mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(ModelUtil.CATEGORY_DTO)))
+        .andExpect(status().isOk());
+
+    verify(categoryService, times(1)).insert(any());
+  }
+
+  @Test
+  public void update_WhenSendExistingCategory_ShouldReturnBadRequest() throws Exception {
+    doReturn(ResponseEntity.ok(false)).when(restTemplate)
+        .exchange(any(), eq(HttpMethod.POST), any(), eq(Boolean.class));
+    doThrow(CategoryExistsException.class).when(categoryService)
+        .insert(any());
+
+    this.mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(ModelUtil.CATEGORY_DTO)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
