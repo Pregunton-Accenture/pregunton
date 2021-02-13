@@ -10,12 +10,22 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -41,6 +51,8 @@ public class CategoryControllerTest {
   private CategoryController categoryController;
   @MockBean
   private CategoryService categoryService;
+  @MockBean
+  private RestTemplate restTemplate;
 
   @Before
   public void setUp() {
@@ -71,6 +83,8 @@ public class CategoryControllerTest {
         .build());
 
     when(categoryService.getAll()).thenReturn(CATEGORY_LIST);
+    doReturn(ResponseEntity.ok(false)).when(restTemplate)
+        .exchange(any(), eq(HttpMethod.POST), any(), eq(Boolean.class));
 
     this.mockMvc.perform(get(BASE_URL))
         .andExpect(status().isOk())
@@ -80,8 +94,11 @@ public class CategoryControllerTest {
   @Test
   public void getAll_WhenNoCategoriesSetOnDB_ShouldReturnsAnEmptyListOfCategories() throws Exception {
     when(categoryService.getAll()).thenReturn(CATEGORY_LIST);
+    doReturn(ResponseEntity.ok(false)).when(restTemplate)
+        .exchange(any(), eq(HttpMethod.POST), any(), eq(Boolean.class));
 
     this.mockMvc.perform(get(BASE_URL))
         .andExpect(status().isNoContent());
   }
+
 }

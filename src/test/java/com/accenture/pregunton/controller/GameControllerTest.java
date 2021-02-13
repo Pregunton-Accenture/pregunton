@@ -8,15 +8,19 @@ import com.accenture.pregunton.service.GameService;
 import com.accenture.pregunton.util.ModelUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -27,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -45,10 +50,17 @@ public class GameControllerTest {
   private GameController subject;
   @MockBean
   private GameService gameService;
+  @MockBean
+  private RestTemplate restTemplate;
+
+  @BeforeEach
+  public void setUp() {
+    doReturn(ResponseEntity.ok(false)).when(restTemplate)
+        .exchange(any(), eq(HttpMethod.POST), any(), eq(Boolean.class));
+  }
 
   @Test
   public void createGame_WhenValidInputCreateGame_ThenReturns201() throws Exception {
-
     Mockito.doReturn(ModelUtil.GAME)
         .when(gameService)
         .create(any(), anyString(), anyLong());

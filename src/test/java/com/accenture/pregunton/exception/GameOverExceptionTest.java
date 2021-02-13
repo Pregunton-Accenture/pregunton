@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GameOverExceptionTest {
 
   @Test
-  public void constructor_ShouldCreateANewInstanceOfGameCodeFoundExceptionTest() {
+  public void constructor_ShouldCreateANewInstanceOfGameCodeFoundException() {
     assertThat(new GameOverException("nickname")).isInstanceOf(GameOverException.class)
         .isNotNull();
   }

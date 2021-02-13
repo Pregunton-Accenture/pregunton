@@ -72,7 +72,7 @@ public class CategoryServiceTest {
   }
 
   @Test
-  public void getAll_WhenNoCategoriesSetOnDB_ShouldReturnsAnEmptyListOfCategories() {
+  public void getAll_WhenTokenIsExpired_ShouldReturnsUnauthorized() {
     doReturn(CATEGORY_LIST).when(categoryRepository)
         .findAll(any(Sort.class));
 

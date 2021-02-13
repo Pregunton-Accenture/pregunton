@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PlayerNotFoundExceptionTest {
 
   @Test
-  public void constructor_ShouldCreateANewInstanceOfGameCodeFoundExceptionTest() {
+  public void constructor_ShouldCreateANewInstanceOfGameCodeFoundException() {
     assertThat(new PlayerNotFoundException(1L)).isInstanceOf(PlayerNotFoundException.class)
         .isNotNull();
   }

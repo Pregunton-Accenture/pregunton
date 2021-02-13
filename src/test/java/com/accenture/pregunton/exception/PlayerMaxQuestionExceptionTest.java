@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PlayerMaxQuestionExceptionTest {
 
   @Test
-  public void constructor_ShouldCreateANewInstanceOfGameCodeFoundExceptionTest() {
+  public void constructor_ShouldCreateANewInstanceOfGameCodeFoundException() {
     assertThat(new PlayerMaxQuestionException("nickname")).isInstanceOf(PlayerMaxQuestionException.class)
         .isNotNull();
   }

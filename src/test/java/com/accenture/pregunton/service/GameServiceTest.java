@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -127,6 +127,13 @@ public class GameServiceTest {
   }
 
   @Test
+  public void addOnePlayer_WhenCodeDoesNotExists_ShouldThrowGameCodeNotFoundException() {
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.empty());
+    assertThrows(GameCodeNotFoundException.class, () -> gameService.addOnePlayer(ModelUtil.CODE, ModelUtil.PLAYER_DTO));
+  }
+
+  @Test
   public void shouldAddAPlayerIfThereIsNone() {
     Game game = Game.builder()
         .rules(ModelUtil.RULES)
@@ -212,8 +219,10 @@ public class GameServiceTest {
 
     gameService.saveQuestion(ModelUtil.CODE, ModelUtil.QUESTION);
 
-    Mockito.verify(gameRepository, Mockito.times(1)).findByCode(any());
-    Mockito.verify(gameRepository, Mockito.times(1)).save(any());
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .findByCode(any());
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .save(any());
   }
 
   @Test
@@ -229,8 +238,10 @@ public class GameServiceTest {
 
     gameService.saveQuestion(ModelUtil.CODE, ModelUtil.QUESTION);
 
-    Mockito.verify(gameRepository, Mockito.times(1)).findByCode(any());
-    Mockito.verify(gameRepository, Mockito.times(1)).save(any());
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .findByCode(any());
+    Mockito.verify(gameRepository, Mockito.times(1))
+        .save(any());
   }
 
   @Test(expected = GameCodeNotFoundException.class)

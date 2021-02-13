@@ -1,6 +1,7 @@
 package com.accenture.pregunton.service;
 
 import com.accenture.model.Game;
+import com.accenture.model.Hit;
 import com.accenture.model.Player;
 import com.accenture.model.Question;
 import com.accenture.pojo.Answer;
@@ -25,13 +26,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -179,7 +180,7 @@ public class PlayerServiceTest {
   }
 
   @Test
-  public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrect_ShouldReturnTrue() {
+  public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrect_ShouldReturnHitDto() {
     Mockito.when(playerRepository.findById(ModelUtil.ID))
         .thenReturn(Optional.of(ModelUtil.PLAYER));
     Mockito.when(gameRepository.getHitByCode(ModelUtil.CODE))
@@ -196,6 +197,41 @@ public class PlayerServiceTest {
     HitDto result = playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
 
     assertEquals(ModelUtil.HIT_DTO, result);
+  }
+
+  @Test
+  public void makeAGuess_IfThePlayerMakeAGuessAndIsIncorrect_ShouldReturnHitDto() {
+    Mockito.when(playerRepository.findById(ModelUtil.ID))
+        .thenReturn(Optional.of(ModelUtil.PLAYER));
+    Mockito.when(gameRepository.getHitByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(ModelUtil.CORRECT_GUESS));
+    Mockito.when(hitRepository.save(any()))
+        .thenReturn(ModelUtil.HIT);
+    Mockito.when(playerRepository.save(any()))
+        .thenReturn(ModelUtil.PLAYER);
+    Mockito.when(modelMapper.map(any(), any()))
+        .thenReturn(ModelUtil.HIT_DTO);
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(ModelUtil.GAME));
+
+    HitDto result = playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, "wrong");
+
+    assertEquals(ModelUtil.HIT_DTO, result);
+  }
+
+  @Test
+  public void makeAGuess_IfThePlayerMakeAGuessAndIsCorrectAndGameDoesNotExists_ShouldThrowGameCodeNotFoundException() {
+    Mockito.when(playerRepository.findById(ModelUtil.ID))
+        .thenReturn(Optional.of(ModelUtil.PLAYER));
+    Mockito.when(gameRepository.getHitByCode(ModelUtil.CODE))
+        .thenReturn(Optional.of(ModelUtil.CORRECT_GUESS));
+    Mockito.when(hitRepository.save(any()))
+        .thenReturn(ModelUtil.HIT);
+    Mockito.when(gameRepository.findByCode(ModelUtil.CODE))
+        .thenReturn(Optional.empty());
+
+    assertThrows(GameCodeNotFoundException.class,
+        () -> playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS));
   }
 
   @Test(expected = GameOverException.class)

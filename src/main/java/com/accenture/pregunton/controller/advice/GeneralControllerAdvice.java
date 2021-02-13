@@ -1,5 +1,6 @@
 package com.accenture.pregunton.controller.advice;
 
+import com.accenture.pojo.SimpleResponse;
 import com.accenture.pojo.UnauthorizedResponseDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
@@ -8,7 +9,6 @@ import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
 import com.accenture.pregunton.exception.UnauthorizedException;
-import com.accenture.pregunton.util.SimpleResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,67 +18,35 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
 
+  private ResponseEntity<SimpleResponse> buildSimpleResponse(String message, HttpStatus httpStatus) {
+    return ResponseEntity.status(httpStatus)
+        .body(SimpleResponse.builder()
+            .message(message)
+            .status(httpStatus.value())
+            .build());
+  }
+
   @ExceptionHandler(Exception.class)
-  protected ResponseEntity<Object> unexpectedErrorHandler(Exception ex) {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .build());
+  protected ResponseEntity<SimpleResponse> unexpectedErrorHandler(Exception ex) {
+    return buildSimpleResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  @ExceptionHandler(GameIdNotFoundException.class)
-  protected ResponseEntity<Object> gameIdNotFoundException(GameIdNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.NOT_FOUND)
-            .build());
+  @ExceptionHandler(value = {
+      GameIdNotFoundException.class,
+      GameCodeNotFoundException.class,
+      CategoryNotFoundException.class,
+      PlayerNotFoundException.class
+  })
+  protected ResponseEntity<SimpleResponse> notFoundExceptionHandler(Exception ex) {
+    return buildSimpleResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
   }
 
-  @ExceptionHandler(GameCodeNotFoundException.class)
-  protected ResponseEntity<Object> gameCodeNotFoundException(GameCodeNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.NOT_FOUND)
-            .build());
-  }
-
-  @ExceptionHandler(CategoryNotFoundException.class)
-  protected ResponseEntity<Object> categoryNotFoundHandler(CategoryNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.NOT_FOUND)
-            .build());
-  }
-
-  @ExceptionHandler(PlayerNotFoundException.class)
-  protected ResponseEntity<Object> playerNotFoundHandler(PlayerNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.NOT_FOUND)
-            .build());
-  }
-
-  @ExceptionHandler(GameOverException.class)
-  protected ResponseEntity<Object> gameOverHandler(GameOverException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.BAD_REQUEST)
-            .build());
-  }
-
-  @ExceptionHandler(LastQuestionNotAnswerException.class)
-  protected ResponseEntity<Object> lastQuestionNotAnswerHandler(LastQuestionNotAnswerException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(SimpleResponse.builder()
-            .message(ex.getMessage())
-            .status(HttpStatus.BAD_REQUEST)
-            .build());
+  @ExceptionHandler(value = {
+      GameOverException.class,
+      LastQuestionNotAnswerException.class
+  })
+  protected ResponseEntity<SimpleResponse> badRequestHandler(Exception ex) {
+    return buildSimpleResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(UnauthorizedException.class)
