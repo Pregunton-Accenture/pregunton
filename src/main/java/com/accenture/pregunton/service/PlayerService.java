@@ -49,7 +49,7 @@ public class PlayerService {
   /**
    * Adds the questions done by player in database.
    *
-   * @param playerId the player that made the question
+   * @param nickName the player that made the question
    * @param gameCode the game where the player ask
    * @param playerQuestion the question
    *
@@ -61,10 +61,10 @@ public class PlayerService {
    * @throws GameCodeNotFoundException if the gameCode does not exist
    * @throws LastQuestionNotAnswerException if the last question made by the player was not answered
    */
-  public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
+  public QuestionDto askQuestion(String nickName, String gameCode, String playerQuestion) {
     checkIfTheGameAlreadyFinished(gameCode);
-    Player player = playerRepository.findById(playerId)
-        .orElseThrow(() -> new PlayerNotFoundException(playerId));
+    Player player = playerRepository.findByNickName(nickName)
+        .orElseThrow(() -> new PlayerNotFoundException(nickName));
     checkIfPlayerCanAsk(player);
     checkIfPlayerCanGuess(player);
     Game game = gameRepository.findByCode(gameCode)
@@ -93,7 +93,7 @@ public class PlayerService {
    * Saves the guess and put "correct" value with <b>true</b> is the string is equals to the {@link Game} hit.
    * </p>
    *
-   * @param playerId the player that made the question
+   * @param nickName the player that made the question
    * @param gameCode the game where the player ask
    * @param guess the hit made by player
    *
@@ -104,10 +104,10 @@ public class PlayerService {
    * @throws GameCodeNotFoundException if the gameCode does not exist
    */
   @Transactional
-  public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
+  public HitDto makeAGuess(String nickName, String gameCode, String guess) {
     checkIfTheGameAlreadyFinished(gameCode);
-    Player player = playerRepository.findById(playerId)
-        .orElseThrow(() -> new PlayerNotFoundException(playerId));
+    Player player = playerRepository.findByNickName(nickName)
+        .orElseThrow(() -> new PlayerNotFoundException(nickName));
     checkIfPlayerCanGuess(player);
     String gameHit = gameRepository.getHitByCode(gameCode)
         .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
@@ -141,8 +141,8 @@ public class PlayerService {
    *
    * @return an Optional with the player data or an empty Optional if the playerId does not exist.
    */
-  public Optional<PlayerDto> getPlayer(Long playerId) {
-    return playerRepository.findById(playerId)
+  public Optional<PlayerDto> getPlayer(String nickName) {
+    return playerRepository.findByNickName(nickName)
         .map((player) -> mapper.map(player, PlayerDto.class));
   }
 

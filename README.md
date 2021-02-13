@@ -1,4 +1,4 @@
-# Pregunton API
+###### Pregunton API
 
 * [Description](#description)
 * [Prerequisites](#prerequisites)
@@ -21,7 +21,6 @@ I will provide a list with the depedencies and their download link:
 * Maven ([Download link](https://maven.apache.org/))
 * Git ([Download link](https://git-scm.com/downloads))
 * MariaDB ([Download link](https://downloads.mariadb.org/))
-* Project Lombok ([Download link](https://projectlombok.org/download))
 
 ## Installation
 
@@ -59,21 +58,21 @@ ___
         * __POST__ method
             * /v1.0 => creates a new game into the database
         * __PATCH__ method
-            * /v1.0/{gameId} => adds a new player into the game that matchs with the provided ID.
+            * /v1.0/{gameCode}/players => adds a new player into the game that matches with the provided ID.
         * __DELETE__ method
-            * /v1.0/{gameId} => remove the game that matchs with the provided ID from the database.
+            * /v1.0/{gameId} => remove the game that matches with the provided ID from the database.
         * __GET__ method
-            * /v1.0/game/{gameId} => retrieves the game information that matchs with the provided ID from the database.
-            * /v1.0/game/code/{code} => get the game questions.
+            * /v1.0/game/{gameId} => retrieves the game information that matches with the provided ID from the database.
+            * /v1.0/{code}/questions => get the questions of a specific game or get only the questions that are not anwered yet.
     * /players
         * __POST__ method
-            * /v1.0/guess => grants a player to make question to the master.
+            * /v1.0/{nickName}/guess => grants a player to make question to the master.
         * __PATCH__ method
-            * /v1.0/ask => adds a new question into the player and the game that matchs with the provided CODE and
+            * /v1.0/{nickName}/questions => adds a new question into the player, and the game that matches with the provided CODE and
               player ID.
         * __GET__ method
-            * /v1.0/{playerId} => seartch a player to get his information that matchs with the provided ID from the
+            * /v1.0/{nickName} => search a player to get his information that matches with the provided ID from the
               database.
     * /categories
         * __GET__ method
-            * / => retrieves all the categories information saved on the database
+            * /v1.0 => retrieves all the categories' information saved on the database

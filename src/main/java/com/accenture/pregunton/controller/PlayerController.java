@@ -30,7 +30,7 @@ public class PlayerController {
   @Autowired
   private PlayerService playerService;
 
-  @PatchMapping("/v1.0/{playerId}/questions")
+  @PatchMapping("/v1.0/{nickName}/questions")
   @ApiOperation("Ask a question.")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "OK"),
@@ -38,13 +38,13 @@ public class PlayerController {
       @ApiResponse(code = 404, message = "Not Found"),
       @ApiResponse(code = 500, message = "Internal Server Error"),
   })
-  public ResponseEntity<QuestionDto> makeAQuestion(@PathVariable Long playerId, @RequestHeader String code,
+  public ResponseEntity<QuestionDto> makeAQuestion(@PathVariable String nickName, @RequestHeader String code,
                                                    String question) {
-    QuestionDto questionDto = playerService.askQuestion(playerId, code, question);
+    QuestionDto questionDto = playerService.askQuestion(nickName, code, question);
     return ResponseEntity.ok(questionDto);
   }
 
-  @PostMapping("/v1.0/{playerId}/guess")
+  @PostMapping("/v1.0/{nickName}/guess")
   @ApiOperation("Make a guess.")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "OK"),
@@ -52,12 +52,12 @@ public class PlayerController {
       @ApiResponse(code = 404, message = "Not Found"),
       @ApiResponse(code = 500, message = "Internal Server Error"),
   })
-  public ResponseEntity<HitDto> makeAGuess(@PathVariable Long playerId, @RequestHeader String code, String guess) {
-    HitDto playerGuess = playerService.makeAGuess(playerId, code, guess);
+  public ResponseEntity<HitDto> makeAGuess(@PathVariable String nickName, @RequestHeader String code, String guess) {
+    HitDto playerGuess = playerService.makeAGuess(nickName, code, guess);
     return ResponseEntity.ok(playerGuess);
   }
 
-  @GetMapping(value = "/v1.0/{playerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/v1.0/{nickName}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation("Search player.")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "OK"),
@@ -66,8 +66,8 @@ public class PlayerController {
       @ApiResponse(code = 404, message = "Not Found"),
       @ApiResponse(code = 500, message = "Internal Server Error"),
   })
-  public ResponseEntity<PlayerDto> obtainPlayer(@NotNull @PathVariable Long playerId) {
-    Optional<PlayerDto> gameDto = playerService.getPlayer(playerId);
+  public ResponseEntity<PlayerDto> obtainPlayer(@NotNull @PathVariable String nickName) {
+    Optional<PlayerDto> gameDto = playerService.getPlayer(nickName);
     return gameDto.map(ResponseEntity::ok)
         .orElseGet((() -> ResponseEntity.noContent()
             .build()));
