@@ -7,6 +7,7 @@ import com.accenture.model.Player;
 import com.accenture.model.Question;
 import com.accenture.model.Rules;
 import com.accenture.pojo.Answer;
+import com.accenture.pojo.CategoryDto;
 import com.accenture.pojo.GameDto;
 import com.accenture.pojo.GameStatus;
 import com.accenture.pojo.HitDto;
@@ -43,6 +44,7 @@ public class ModelUtil {
   public static ModelMapper MODEL_MAPPER = new ModelMapper();
   //Dtos
   public static final PlayerDto PLAYER_DTO = MODEL_MAPPER.map(PLAYER, PlayerDto.class);
+  public static final CategoryDto CATEGORY_DTO = MODEL_MAPPER.map(CATEGORY, CategoryDto.class);
   public static final QuestionDto QUESTION_DTO = MODEL_MAPPER.map(QUESTION, QuestionDto.class);
   public static final HitDto HIT_DTO = MODEL_MAPPER.map(HIT, HitDto.class);
   public static final GameDto GAME_DTO = MODEL_MAPPER.map(GAME, GameDto.class);

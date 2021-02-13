@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `questions` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id_player` bigint(20) NOT NULL DEFAULT 0,
   `question` varchar(255) DEFAULT NULL,
-  `answer` enum('Y','N') NOT NULL,
+  `answer` varchar(50) NOT NULL,
   `published` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `FK_questions_players` (`id_player`),

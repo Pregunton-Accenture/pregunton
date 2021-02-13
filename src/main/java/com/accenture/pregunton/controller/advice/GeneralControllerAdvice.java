@@ -2,6 +2,7 @@ package com.accenture.pregunton.controller.advice;
 
 import com.accenture.pojo.SimpleResponse;
 import com.accenture.pojo.UnauthorizedResponseDto;
+import com.accenture.pregunton.exception.CategoryExistsException;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
 import com.accenture.pregunton.exception.GameFinishedException;
@@ -9,6 +10,7 @@ import com.accenture.pregunton.exception.GameIdNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerNotFoundException;
+import com.accenture.pregunton.exception.QuestionIdNotFoundException;
 import com.accenture.pregunton.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +38,8 @@ public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
       GameIdNotFoundException.class,
       GameCodeNotFoundException.class,
       CategoryNotFoundException.class,
-      PlayerNotFoundException.class
+      PlayerNotFoundException.class,
+      QuestionIdNotFoundException.class
   })
   protected ResponseEntity<SimpleResponse> notFoundExceptionHandler(Exception ex) {
     return buildSimpleResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -45,7 +48,8 @@ public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
   @ExceptionHandler(value = {
       GameOverException.class,
       LastQuestionNotAnswerException.class,
-      GameFinishedException.class
+      GameFinishedException.class,
+      CategoryExistsException.class
   })
   protected ResponseEntity<SimpleResponse> badRequestHandler(Exception ex) {
     return buildSimpleResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

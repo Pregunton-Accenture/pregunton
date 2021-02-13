@@ -1,4 +1,4 @@
-###### Pregunton API
+# Pregunton API
 
 * [Description](#description)
 * [Prerequisites](#prerequisites)
@@ -15,7 +15,7 @@ and win the game.
 ## Prerequisites
 
 ___
-I will provide a list with the depedencies and their download link:
+I will provide a list with the dependencies, and their download link:
 
 * Java 8 ([Download link](https://www.java.com/es/download/))
 * Maven ([Download link](https://maven.apache.org/))
@@ -46,8 +46,8 @@ ___
 2. Then, you have to start up the application with ```mvn spring-boot:run``` command.
 3. If the process executed successfully, you could make requests to the application endpoints via http://localhost:8080.
 
-**NOTE:** You could access to an user interface with http://localhost:8080/swagger-ui.html to do those requests and
-provides to you some hints to know the data to sent.
+**NOTE:** You could access to a user interface with http://localhost:8080/swagger-ui.html to do those requests and
+provides to you some hints to know the data to send.
 
 ## Endpoints
 
