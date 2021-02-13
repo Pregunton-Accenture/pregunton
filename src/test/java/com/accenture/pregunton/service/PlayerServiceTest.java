@@ -5,10 +5,12 @@ import com.accenture.model.Hit;
 import com.accenture.model.Player;
 import com.accenture.model.Question;
 import com.accenture.pojo.Answer;
+import com.accenture.pojo.GameStatus;
 import com.accenture.pojo.HitDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
+import com.accenture.pregunton.exception.GameFinishedException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerMaxQuestionException;
@@ -54,10 +56,19 @@ public class PlayerServiceTest {
   @Mock
   private GameService gameService;
 
+  private Game gameFinished;
+
   @Before
   public void setup() {
     Mockito.when(playerRepository.findById(anyLong()))
         .thenReturn(Optional.of(ModelUtil.PLAYER));
+
+    Mockito.when(gameRepository.findByCode(any()))
+        .thenReturn(Optional.of(ModelUtil.GAME));
+
+    gameFinished = Game.builder()
+        .status(GameStatus.FINISHED)
+        .build();
 
     Mockito.when(modelMapper.map(ModelUtil.QUESTION, QuestionDto.class))
         .thenReturn(ModelUtil.QUESTION_DTO);
@@ -264,6 +275,20 @@ public class PlayerServiceTest {
     Mockito.when(gameRepository.findByCode(any()))
         .thenReturn(Optional.empty());
     playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+  }
+
+  @Test(expected = GameFinishedException.class)
+  public void makeAGuess_IfThePlayerMakeAGuessAndTheGameHaveAlreadyFinished_ShouldThrowGameFinishedException() {
+    Mockito.when(gameRepository.findByCode(any()))
+        .thenReturn(Optional.of(gameFinished));
+    playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS);
+  }
+
+  @Test(expected = GameFinishedException.class)
+  public void askQuestion_IfThePlayerAskAQuestionAndTheGameHaveAlreadyFinished_ShouldThrowGameFinishedException() {
+    Mockito.when(gameRepository.findByCode(any()))
+        .thenReturn(Optional.of(gameFinished));
+    playerService.askQuestion(ModelUtil.ID, ModelUtil.CODE, ModelUtil.DUMMY_QUESTION);
   }
 
 }

@@ -8,6 +8,7 @@ import com.accenture.model.Question;
 import com.accenture.model.Rules;
 import com.accenture.pojo.Answer;
 import com.accenture.pojo.GameDto;
+import com.accenture.pojo.GameStatus;
 import com.accenture.pojo.HitDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
@@ -58,6 +59,7 @@ public class ModelUtil {
         .players(Stream.of(PLAYER)
             .collect(Collectors.toList()))
         .hit(HIT_VALUE)
+        .status(GameStatus.IN_PROGRESS)
         .build();
   }
 
