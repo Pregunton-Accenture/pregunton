@@ -4,6 +4,7 @@ import com.accenture.pojo.SimpleResponse;
 import com.accenture.pojo.UnauthorizedResponseDto;
 import com.accenture.pregunton.exception.CategoryNotFoundException;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
+import com.accenture.pregunton.exception.GameFinishedException;
 import com.accenture.pregunton.exception.GameIdNotFoundException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
@@ -43,7 +44,8 @@ public class GeneralControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(value = {
       GameOverException.class,
-      LastQuestionNotAnswerException.class
+      LastQuestionNotAnswerException.class,
+      GameFinishedException.class
   })
   protected ResponseEntity<SimpleResponse> badRequestHandler(Exception ex) {
     return buildSimpleResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

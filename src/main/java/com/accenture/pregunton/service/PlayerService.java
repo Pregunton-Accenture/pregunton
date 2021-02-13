@@ -10,6 +10,7 @@ import com.accenture.pojo.HitDto;
 import com.accenture.pojo.PlayerDto;
 import com.accenture.pojo.QuestionDto;
 import com.accenture.pregunton.exception.GameCodeNotFoundException;
+import com.accenture.pregunton.exception.GameFinishedException;
 import com.accenture.pregunton.exception.GameOverException;
 import com.accenture.pregunton.exception.LastQuestionNotAnswerException;
 import com.accenture.pregunton.exception.PlayerMaxQuestionException;
@@ -61,6 +62,7 @@ public class PlayerService {
    * @throws LastQuestionNotAnswerException if the last question made by the player was not answered
    */
   public QuestionDto askQuestion(Long playerId, String gameCode, String playerQuestion) {
+    checkIfTheGameAlreadyFinished(gameCode);
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
     checkIfPlayerCanAsk(player);
@@ -103,6 +105,7 @@ public class PlayerService {
    */
   @Transactional
   public HitDto makeAGuess(Long playerId, String gameCode, String guess) {
+    checkIfTheGameAlreadyFinished(gameCode);
     Player player = playerRepository.findById(playerId)
         .orElseThrow(() -> new PlayerNotFoundException(playerId));
     checkIfPlayerCanGuess(player);
@@ -197,5 +200,18 @@ public class PlayerService {
       }
     }
     return result;
+  }
+
+  /**
+   * Validates if the game have already finished
+   *
+   * @param gameCode
+   */
+  private void checkIfTheGameAlreadyFinished(String gameCode) {
+    Game game = gameRepository.findByCode(gameCode)
+        .orElseThrow(() -> new GameCodeNotFoundException(gameCode));
+    if (game.getStatus().equals(GameStatus.FINISHED)) {
+      throw new GameFinishedException();
+    }
   }
 }
