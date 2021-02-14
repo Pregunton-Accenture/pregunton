@@ -24,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -57,10 +56,10 @@ public class PlayerControllerTest {
   @Test
   public void makeAQuestion_whenValidInput_ShouldReturn200() throws Exception {
 
-    Mockito.when(playerService.askQuestion(anyLong(), anyString(), anyString()))
+    Mockito.when(playerService.askQuestion(anyString(), anyString(), anyString()))
         .thenReturn(ModelUtil.QUESTION_DTO);
 
-    mvc.perform(patch("/players/v1.0/{playerId}/questions", ModelUtil.ID).characterEncoding("utf-8")
+    mvc.perform(patch("/players/v1.0/{nickName}/questions", ModelUtil.NICK_NAME).characterEncoding("utf-8")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.QUESTION_DTO))
         .header("code", ModelUtil.CODE))
@@ -73,7 +72,7 @@ public class PlayerControllerTest {
     Mockito.when(playerService.askQuestion(any(), any(), any()))
         .thenThrow(new LastQuestionNotAnswerException(ModelUtil.PLAYER_DTO.getNickName()));
 
-    mvc.perform(patch("/players/v1.0/{playerId}/questions", ModelUtil.ID).characterEncoding("utf-8")
+    mvc.perform(patch("/players/v1.0/{nickName}/questions", ModelUtil.NICK_NAME).characterEncoding("utf-8")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.QUESTION_DTO))
         .header("code", ModelUtil.CODE))
@@ -83,12 +82,12 @@ public class PlayerControllerTest {
   @Test
   public void obtainPlayer_whenValidInput_ShouldReturn200() throws Exception {
 
-    Mockito.when(playerService.getPlayer(anyLong()))
+    Mockito.when(playerService.getPlayer(anyString()))
         .thenReturn(Optional.of(ModelUtil.PLAYER_DTO));
 
-    mvc.perform(get("/players/v1.0/{playerId}", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/players/v1.0/{nickName}", ModelUtil.NICK_NAME).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
-        .param("playerId", String.valueOf(ModelUtil.ID))
+        .param("nickName", String.valueOf(ModelUtil.NICK_NAME))
         .characterEncoding("utf-8"))
         .andExpect(status().isOk());
 
@@ -97,12 +96,12 @@ public class PlayerControllerTest {
   @Test
   public void obtainPlayer_whenValidInputButEmptyOptional_ShouldReturn204() throws Exception {
 
-    Mockito.when(playerService.getPlayer(anyLong()))
+    Mockito.when(playerService.getPlayer(anyString()))
         .thenReturn(Optional.empty());
 
-    mvc.perform(get("/players/v1.0/{playerId}", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/players/v1.0/{nickName}", ModelUtil.NICK_NAME).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
-        .param("playerId", String.valueOf(ModelUtil.ID))
+        .param("nickName", String.valueOf(ModelUtil.NICK_NAME))
         .characterEncoding("utf-8"))
         .andExpect(status().isNoContent());
 
@@ -111,13 +110,13 @@ public class PlayerControllerTest {
   @Test
   public void obtainPlayer_WhenInvalidInput_ShouldReturn404Exception() throws Exception {
 
-    Mockito.doThrow(new PlayerNotFoundException(ModelUtil.ID))
+    Mockito.doThrow(new PlayerNotFoundException(ModelUtil.NICK_NAME))
         .when(playerService)
         .getPlayer(any());
 
-    mvc.perform(get("/player/v1.0/{playerId}", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/player/v1.0/{nickName}", ModelUtil.NICK_NAME).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
-        .param("playerId", String.valueOf(ModelUtil.ID))
+        .param("nickName", String.valueOf(ModelUtil.NICK_NAME))
         .characterEncoding("utf-8"))
         .andExpect(status().is4xxClientError());
 
@@ -126,10 +125,10 @@ public class PlayerControllerTest {
   @Test
   public void makeAGuess_WhenAPlayerMakeAGuess_ShouldReturn200() throws Exception {
 
-    Mockito.when(playerService.makeAGuess(ModelUtil.ID, ModelUtil.CODE, ModelUtil.CORRECT_GUESS))
+    Mockito.when(playerService.makeAGuess(ModelUtil.NICK_NAME, ModelUtil.CODE, ModelUtil.CORRECT_GUESS))
         .thenReturn(ModelUtil.HIT_DTO);
 
-    mvc.perform(post("/players/v1.0/{playerId}/guess", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(post("/players/v1.0/{nickName}/guess", ModelUtil.NICK_NAME).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
         .header("code", ModelUtil.CODE)
         .characterEncoding("utf-8"))
@@ -143,7 +142,7 @@ public class PlayerControllerTest {
     Mockito.when(playerService.makeAGuess(any(), any(), any()))
         .thenThrow(new GameOverException(ModelUtil.PLAYER_DTO.getNickName()));
 
-    mvc.perform(post("/players/v1.0/{playerId}/guess", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(post("/players/v1.0/{nickName}/guess", ModelUtil.NICK_NAME).contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(ModelUtil.HIT_DTO))
         .header("code", ModelUtil.CODE)
         .characterEncoding("utf-8"))
@@ -155,12 +154,12 @@ public class PlayerControllerTest {
   public void obtainPlayer_WhenSendinInvalidPlayerId_ShouldThrowPlayerNotFoundException() throws Exception {
 
     Mockito.when(playerService.getPlayer(any()))
-        .thenThrow(new PlayerNotFoundException(ModelUtil.ID));
+        .thenThrow(new PlayerNotFoundException(ModelUtil.NICK_NAME));
 
-    mvc.perform(get("/players/v1.0/{playerId}", ModelUtil.ID).contentType(MediaType.APPLICATION_JSON)
+    mvc.perform(get("/players/v1.0/{nickName}", ModelUtil.NICK_NAME).contentType(MediaType.APPLICATION_JSON)
         .characterEncoding("utf-8")
         .content(objectMapper.writeValueAsString(ModelUtil.PLAYER_DTO))
-        .param("playerId", String.valueOf(ModelUtil.ID)))
+        .param("nickName", String.valueOf(ModelUtil.NICK_NAME)))
         .andExpect(status().is4xxClientError());
   }
 

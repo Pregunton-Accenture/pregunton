@@ -15,13 +15,14 @@ and win the game.
 ## Prerequisites
 
 ___
-I will provide a list with the depedencies and their download link:
+I will provide a list with the dependencies, and their download link:
 
 * Java 8 ([Download link](https://www.java.com/es/download/))
 * Maven ([Download link](https://maven.apache.org/))
 * Git ([Download link](https://git-scm.com/downloads))
 * MariaDB ([Download link](https://downloads.mariadb.org/))
-* Project Lombok ([Download link](https://projectlombok.org/download))
+* Pregunton-Core ([Repository link](https://github.com/Pregunton-Accenture/pregunton-core/))
+* Authentication ([Repository link](https://github.com/Pregunton-Accenture/authentication/))
 
 ## Installation
 
@@ -47,8 +48,8 @@ ___
 2. Then, you have to start up the application with ```mvn spring-boot:run``` command.
 3. If the process executed successfully, you could make requests to the application endpoints via http://localhost:8080.
 
-**NOTE:** You could access to an user interface with http://localhost:8080/swagger-ui.html to do those requests and
-provides to you some hints to know the data to sent.
+**NOTE:** You could access to a user interface with http://localhost:8080/swagger-ui.html to do those requests and
+provides to you some hints to know the data to send.
 
 ## Endpoints
 
@@ -59,21 +60,21 @@ ___
         * __POST__ method
             * /v1.0 => creates a new game into the database
         * __PATCH__ method
-            * /v1.0/{gameId} => adds a new player into the game that matchs with the provided ID.
+            * /v1.0/{gameCode}/players => adds a new player into the game that matches with the provided ID.
         * __DELETE__ method
-            * /v1.0/{gameId} => remove the game that matchs with the provided ID from the database.
+            * /v1.0/{gameId} => remove the game that matches with the provided ID from the database.
         * __GET__ method
-            * /v1.0/game/{gameId} => retrieves the game information that matchs with the provided ID from the database.
-            * /v1.0/game/code/{code} => get the game questions.
+            * /v1.0/game/{gameId} => retrieves the game information that matches with the provided ID from the database.
+            * /v1.0/{code}/questions => get the questions of a specific game or get only the questions that are not anwered yet.
     * /players
         * __POST__ method
-            * /v1.0/guess => grants a player to make question to the master.
+            * /v1.0/{nickName}/guess => grants a player to make question to the master.
         * __PATCH__ method
-            * /v1.0/ask => adds a new question into the player and the game that matchs with the provided CODE and
+            * /v1.0/{nickName}/questions => adds a new question into the player, and the game that matches with the provided CODE and
               player ID.
         * __GET__ method
-            * /v1.0/{playerId} => seartch a player to get his information that matchs with the provided ID from the
+            * /v1.0/{nickName} => search a player to get his information that matches with the provided ID from the
               database.
     * /categories
         * __GET__ method
-            * / => retrieves all the categories information saved on the database
+            * /v1.0 => retrieves all the categories' information saved on the database
