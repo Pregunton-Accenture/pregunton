@@ -205,7 +205,7 @@ public class PlayerService {
   /**
    * Validates if the game have already finished
    *
-   * @param gameCode
+   * @param gameCode the game code to check game status
    */
   private void checkIfTheGameAlreadyFinished(String gameCode) {
     Game game = gameRepository.findByCode(gameCode)
