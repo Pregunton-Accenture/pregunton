@@ -137,7 +137,7 @@ public class PlayerService {
   /**
    * Retrieves the player by the playerId.
    *
-   * @param playerId the player identifier to search
+   * @param nickName the player identifier to search
    *
    * @return an Optional with the player data or an empty Optional if the playerId does not exist.
    */
