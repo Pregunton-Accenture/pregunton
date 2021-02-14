@@ -103,7 +103,7 @@ public class GameController {
   }
 
   @GetMapping(value = "/v1.0/{code}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiOperation("get the questions of a specific game or get only the questions that are not anwered yet.")
+  @ApiOperation("get the questions of a specific game or get only the questions that are not answered yet.")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "OK"),
       @ApiResponse(code = 204, message = "No content"),

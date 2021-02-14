@@ -78,3 +78,9 @@ ___
     * /categories
         * __GET__ method
             * /v1.0 => retrieves all the categories' information saved on the database
+    * /answers
+        * __GET__ method
+            * /v1.0 => retrieves a list of answers.
+    * /questions
+        * __PATCH__ method
+            * /v1.0 => updates the answer of a question.

@@ -16,6 +16,11 @@ public class QuestionService {
   @Autowired
   private QuestionRepository questionRepository;
 
+  /**
+   * Answer a question made from a player
+   *
+   * @param questionDto the question of the player
+   */
   public void updateAnswer(QuestionDto questionDto) {
     Objects.requireNonNull(questionDto);
     Objects.requireNonNull(questionDto.getId());
